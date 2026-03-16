@@ -27,6 +27,489 @@
         .heat-heading { color: var(--heat-blue-800); }
         .heat-sidebar { background: var(--heat-blue-800); }
         .heat-accent { background: var(--heat-green); }
+
+        /* E4: Map Loading Spinner */
+        #map-loading-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--heat-bg-alt);
+            border-radius: 6px;
+            z-index: 10;
+            gap: 16px;
+        }
+        .map-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--heat-line);
+            border-top-color: var(--heat-green-600);
+            border-radius: 50%;
+            animation: map-spin 0.8s linear infinite;
+        }
+        @keyframes map-spin {
+            to { transform: rotate(360deg); }
+        }
+        .map-loading-text {
+            font-size: 14px;
+            color: var(--heat-text);
+            font-family: 'Open Sans', sans-serif;
+        }
+        /* E4: Data Source Banner */
+        #data-source-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-family: 'Open Sans', sans-serif;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        #data-source-banner.visible {
+            transform: translateY(0);
+        }
+        #data-source-banner.banner-amber {
+            background: #fef3c7;
+            color: #92400e;
+            border-bottom: 2px solid #f59e0b;
+        }
+        #data-source-banner.banner-green {
+            background: #d1fae5;
+            color: #064e3b;
+            border-bottom: 2px solid var(--heat-green-600);
+        }
+        .banner-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+            opacity: 0.6;
+            padding: 0 4px;
+        }
+        .banner-close:hover { opacity: 1; }
+        /* E4: Map Fallback Table */
+        #map-fallback-table {
+            width: 100%;
+            height: 500px;
+            overflow-y: auto;
+            background: var(--heat-bg-alt);
+            border-radius: 6px;
+            padding: 8px;
+        }
+        .fallback-notice {
+            padding: 8px 12px;
+            background: #fff3cd;
+            border-left: 4px solid #f59e0b;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        .fallback-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .fallback-table thead th {
+            background: var(--heat-blue-800);
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .fallback-table thead th.sortable { cursor: pointer; user-select: none; }
+        .fallback-table thead th.sortable:hover { background: #005ca8; }
+        .fallback-table thead th .sort-indicator { margin-left: 4px; opacity: 0.5; font-size: 10px; }
+        .fallback-table thead th.sorted .sort-indicator { opacity: 1; }
+        .fallback-table tbody tr { cursor: pointer; border-bottom: 1px solid var(--heat-line); transition: background 0.1s; }
+        .fallback-table tbody tr:hover { background: #e8f4fd; }
+        .fallback-table tbody td { padding: 7px 10px; color: var(--heat-text); vertical-align: middle; }
+        .fallback-table tbody td:first-child { font-weight: 600; }
+        .status-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+
+        /* D — Cross-Cutting Utilities */
+/* ---- Tag tooltip "?" icon ---- */
+.d-cc-tag-tooltip-icon,
+.status-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid #9ca3af;
+  background: transparent;
+  color: #6b7280;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: help;
+  margin-left: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+  font-family: inherit;
+}
+.d-cc-tag-tooltip-icon:hover,
+.status-info-icon:hover {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #6b7280;
+}
+.d-cc-tag-tooltip-icon:focus,
+.status-info-icon:focus {
+  outline: 2px solid var(--heat-green, #62d32f);
+  outline-offset: 1px;
+}
+
+        /* D1 — Country Search + Regional Filter Bar */
+#d1-search-bar-container {
+  padding: 12px 16px 8px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--heat-line, #d9e1e8);
+}
+.d1-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.d1-search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 6px 10px;
+  gap: 6px;
+  flex: 1 1 200px;
+  min-width: 160px;
+  max-width: 320px;
+  transition: border-color 0.15s ease;
+}
+.d1-search-input-wrapper:focus-within {
+  border-color: var(--heat-green, #62d32f);
+  box-shadow: 0 0 0 2px rgba(98, 211, 47, 0.18);
+}
+.d1-search-icon {
+  font-size: 13px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+.d1-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: #374151;
+  flex: 1;
+  min-width: 0;
+}
+.d1-input::placeholder {
+  color: #9ca3af;
+}
+.d1-clear-btn {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.d1-clear-btn:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.d1-region-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.d1-region-btn {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #d1d5db;
+  background: #ffffff;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.d1-region-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #374151;
+}
+.d1-region-btn--active,
+.d1-region-btn[aria-pressed="true"] {
+  background: var(--heat-blue-800, #003e51);
+  border-color: var(--heat-blue-800, #003e51);
+  color: #ffffff;
+}
+.d1-region-btn--active[data-region="SADC"] {
+  background: var(--heat-green-600, #00953c);
+  border-color: var(--heat-green-600, #00953c);
+}
+.d1-region-btn--active[data-region="ECOWAS"] {
+  background: var(--heat-orange, #ff5721);
+  border-color: var(--heat-orange, #ff5721);
+}
+.d1-region-btn--active[data-region="EAC"] {
+  background: var(--heat-blue-600, #005ca8);
+  border-color: var(--heat-blue-600, #005ca8);
+}
+.d1-result-count {
+  font-size: 11px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .d1-search-bar { flex-direction: column; align-items: stretch; }
+  .d1-search-input-wrapper { max-width: 100%; }
+  .d1-region-filters { justify-content: flex-start; }
+}
+
+        /* D2 — Data Completeness Indicator */
+.d2-completeness-widget {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 12px 0;
+  font-size: 13px;
+}
+.d2-meter--green { border-left: 4px solid #00953c; }
+.d2-meter--amber { border-left: 4px solid #f59e0b; }
+.d2-meter--red   { border-left: 4px solid #c21632; }
+.d2-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.d2-title {
+  font-weight: 600;
+  color: #374151;
+  flex: 1;
+}
+.d2-score-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #e5e7eb;
+  color: #374151;
+}
+.d2-meter--green .d2-score-badge { background: #d1fae5; color: #065f46; }
+.d2-meter--amber .d2-score-badge { background: #fef3c7; color: #92400e; }
+.d2-meter--red .d2-score-badge   { background: #fee2e2; color: #991b1b; }
+.d2-info-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #9ca3af;
+  background: transparent;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.d2-info-btn:hover { background: #f3f4f6; color: #374151; }
+.d2-dot-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+.d2-dot { font-size: 16px; line-height: 1; }
+.d2-dot--filled { color: var(--heat-green-600, #00953c); }
+.d2-meter--amber .d2-dot--filled { color: #f59e0b; }
+.d2-meter--red .d2-dot--filled   { color: #c21632; }
+.d2-dot--empty { color: #d1d5db; }
+.d2-pct-label { font-size: 11px; color: #6b7280; margin-left: 6px; }
+.d2-detail-panel { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+.d2-detail-panel--open { max-height: 300px; }
+.d2-detail-title { margin: 8px 0 4px; font-weight: 600; color: #374151; font-size: 12px; }
+.d2-missing-list { margin: 0; padding-left: 0; list-style: none; font-size: 12px; color: #6b7280; }
+.d2-missing-list li { padding: 2px 0; border-bottom: 1px solid #f3f4f6; }
+.d2-missing-list li:last-child { border-bottom: none; }
+.d2-all-present { font-size: 12px; color: #065f46; margin: 6px 0 0; }
+
+        /* D3 — Live DB Badge */
+.d3-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  background: #ffffff;
+}
+.d3-badge--pending { border-color: #d1d5db; color: #9ca3af; }
+.d3-badge--pending .d3-badge-dot { color: #9ca3af; animation: d3-pulse 1.2s ease-in-out infinite; }
+.d3-badge--live { border-color: #6ee7b7; color: #065f46; background: #ecfdf5; }
+.d3-badge--live .d3-badge-dot { color: #00953c; }
+.d3-badge--cached { border-color: #fcd34d; color: #92400e; background: #fffbeb; }
+.d3-badge--cached .d3-badge-dot { color: #f59e0b; }
+@keyframes d3-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.d3-modal-footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #e5e7eb; }
+.d3-source-line { font-size: 11px; color: #6b7280; margin: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; }
+.d3-source-label { font-weight: 600; color: #6b7280; }
+.d3-source-value { color: #6b7280; word-break: break-word; flex: 1; }
+.d3-source-sep { color: #d1d5db; }
+.d3-verified-value { color: #6b7280; white-space: nowrap; }
+.d3-outdated-warning { display: flex; align-items: flex-start; gap: 6px; background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #92400e; margin-bottom: 8px; line-height: 1.4; }
+
+        /* D4 — Export CSV Button */
+.d4-export-bar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; flex-wrap: wrap; }
+.d4-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #003e51;
+  background: #ffffff;
+  border: 1.5px solid #003e51;
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+.d4-export-btn:hover { background: #003e51; color: #ffffff; box-shadow: 0 2px 6px rgba(0,62,81,0.20); }
+.d4-export-btn:active { background: #002a38; border-color: #002a38; box-shadow: none; }
+.d4-export-icon { font-size: 14px; line-height: 1; }
+.d4-export-help { font-size: 11px; color: #9ca3af; }
+
+        /* D5 — Implementation Timeline */
+#section-timeline { padding: 24px 20px; }
+#section-timeline h2 { font-size: 18px; font-weight: 700; color: var(--heat-blue-800, #003e51); margin: 0 0 6px; }
+#section-timeline .d5-section-subtitle { font-size: 13px; color: #6b7280; margin: 0 0 20px; }
+#d5-timeline-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 4px 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+#d5-timeline-container svg { display: block; min-width: 600px; }
+.d5-event { transition: opacity 0.15s; }
+.d5-event:hover { opacity: 0.85; }
+.d5-tooltip {
+  position: absolute;
+  z-index: 10000;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  max-width: 300px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  pointer-events: none;
+  font-size: 12px;
+  color: #374151;
+  line-height: 1.5;
+}
+.d5-tt-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.d5-tt-label { font-weight: 600; color: #003e51; font-size: 13px; flex: 1; }
+.d5-tt-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+.d5-tt-badge--done { background: #d1fae5; color: #065f46; }
+.d5-tt-badge--upcoming { background: #fff7ed; color: #c2410c; }
+.d5-tt-row { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
+.d5-tt-detail { margin-top: 8px; font-size: 11.5px; color: #4b5563; border-top: 1px solid #f3f4f6; padding-top: 8px; line-height: 1.6; }
+@media (max-width: 768px) {
+  #section-timeline { padding: 16px 12px; }
+  .d5-tooltip { max-width: 240px; font-size: 11px; }
+}
+
+        /* D6 — Regional Reference Comparison Panel */
+.d6-benchmark-panel { margin: 16px 0; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.d6-panel-header { background: #f9fafb; padding: 10px 14px; border-bottom: 1px solid #e5e7eb; }
+.d6-panel-title { font-size: 14px; font-weight: 700; color: #003e51; display: flex; align-items: center; gap: 6px; }
+.d6-panel-meta { font-size: 11.5px; color: #6b7280; margin-top: 2px; }
+.d6-info-btn {
+  width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #9ca3af;
+  background: transparent; color: #6b7280; font-size: 10px; font-weight: 700;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; flex-shrink: 0; transition: background 0.15s;
+}
+.d6-info-btn:hover { background: #f3f4f6; color: #374151; }
+.d6-table-wrapper { overflow-x: auto; }
+.d6-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.d6-th {
+  text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: #6b7280; padding: 8px 12px; background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb; white-space: nowrap;
+}
+.d6-table-row td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; color: #374151; }
+.d6-table-row:last-child td { border-bottom: none; }
+.d6-table-row:hover td { background: #fafafa; }
+.d6-col-appliance { font-weight: 500; white-space: nowrap; min-width: 140px; }
+.d6-col-country { font-variant-numeric: tabular-nums; min-width: 110px; }
+.d6-col-norm { font-size: 12px; color: #4b5563; min-width: 140px; }
+.d6-col-status { white-space: nowrap; min-width: 120px; }
+.d6-ref-standard { color: #9ca3af; font-size: 10.5px; display: block; margin-top: 1px; }
+.d6-badge {
+  display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px;
+  border-radius: 12px; font-size: 12px; font-weight: 500; white-space: nowrap; cursor: help;
+}
+.d6-phase2-row .d6-phase2-cell { background: #eff6ff; padding: 8px 12px; font-size: 11.5px; color: #1d4ed8; border-top: none; border-bottom: 1px solid #e5e7eb; }
+.d6-phase2-label { font-weight: 600; margin-right: 4px; }
+.d6-loading { padding: 16px; font-size: 13px; color: #9ca3af; text-align: center; }
+.benchmark-country-note { display: flex; gap: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.5; border-bottom: 1px solid #e5e7eb; }
+.benchmark-note--warning { background: #fffbeb; border-left: 3px solid #f59e0b; }
+.benchmark-note--info { background: #eff6ff; border-left: 3px solid #60a5fa; }
+.benchmark-note__icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.benchmark-note__content p { margin: 4px 0 0; color: #4b5563; }
+.benchmark-data-alert { background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; border-radius: 0; padding: 10px 14px; font-size: 12px; color: #92400e; margin: 0; border-left-width: 4px; }
+@media (max-width: 768px) {
+  .d6-table thead { display: none; }
+  .d6-table-row, .d6-table-row td { display: block; width: 100%; box-sizing: border-box; }
+  .d6-table-row { border: 1px solid #e5e7eb; border-radius: 6px; margin: 8px 12px; padding: 4px 0; width: calc(100% - 24px); }
+  .d6-table-row td { border-bottom: none; padding: 5px 10px; }
+  .d6-col-appliance { font-size: 13px; font-weight: 700; color: #003e51; }
+  .d6-col-status { padding-bottom: 10px; }
+}
     </style>
 </head>
 <body>
@@ -92,6 +575,9 @@
                 <a href="#" onclick="setView('contacts')" id="nav-contacts" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
                     <i class="fa-solid fa-address-book w-5"></i> Regional Contacts
                 </a>
+                <a href="#" onclick="setView('timeline'); return false;" id="nav-timeline" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-timeline w-5"></i> Timeline
+                </a>
             </nav>
             <!-- Footer -->
             <div class="p-4 border-t border-white/10 text-xs text-white/40">
@@ -122,6 +608,12 @@
                     <div id="stat-none" class="text-3xl font-bold" style="color: #94a3b8;">0</div>
                 </div>
             </div>
+
+            <!-- D1: Search + Filter Bar -->
+            <div id="d1-search-bar-container"></div>
+
+            <!-- D4: Export CSV Button -->
+            <div id="d4-export-btn-container"></div>
 
             <!-- Map -->
             <div class="bg-white rounded-lg shadow-sm border p-4" style="border-color: var(--heat-line);">
@@ -540,6 +1032,15 @@
                     </div>
                 </div>
             </div>
+
+            <!-- D5: Timeline Section -->
+            <div id="section-timeline" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6 mb-6" style="border-color: var(--heat-line);">
+                    <h3 class="font-semibold heat-heading text-lg mb-2"><i class="fa-solid fa-timeline mr-2"></i>MEPS Implementation Timeline</h3>
+                    <p class="text-sm text-gray-500 mb-4 d5-section-subtitle">Key milestones in African MEPS adoption, 2010–2035. Sources: SADC Secretariat, EAC Standards Committee, ECREEE, U4E.</p>
+                    <div id="d5-timeline-container"></div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -604,25 +1105,196 @@
             "South Africa": { region: "SADC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" }
         };
 
-        // Fetch data from Supabase using REST API directly (more reliable than JS client)
+        // E4: Timeout fetch utility
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+            const controller = new AbortController();
+            const timerId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(timerId);
+                return response;
+            } catch (err) {
+                clearTimeout(timerId);
+                if (err.name === 'AbortError') {
+                    throw new Error(`Request timed out after ${timeoutMs}ms: ${url}`);
+                }
+                throw err;
+            }
+        }
+
+        // E4: Data source banner state
+        let _bannerEl = null;
+        let _bannerAutoDismissTimer = null;
+
+        function _ensureBanner() {
+            if (!_bannerEl) {
+                _bannerEl = document.createElement('div');
+                _bannerEl.id = 'data-source-banner';
+                const msgSpan = document.createElement('span');
+                msgSpan.id = 'data-source-banner-msg';
+                _bannerEl.appendChild(msgSpan);
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'banner-close';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.setAttribute('aria-label', 'Dismiss');
+                closeBtn.onclick = dismissDataSourceBanner;
+                _bannerEl.appendChild(closeBtn);
+                document.body.appendChild(_bannerEl);
+            }
+            return _bannerEl;
+        }
+
+        function showDataSourceBanner(source, lastAttempt) {
+            const banner = _ensureBanner();
+            const msgEl = document.getElementById('data-source-banner-msg');
+            if (_bannerAutoDismissTimer) { clearTimeout(_bannerAutoDismissTimer); _bannerAutoDismissTimer = null; }
+            banner.classList.remove('banner-amber', 'banner-green');
+            if (source === 'live') {
+                banner.classList.add('banner-green');
+                msgEl.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>Data loaded from live database — all figures are current.';
+                _bannerAutoDismissTimer = setTimeout(() => dismissDataSourceBanner(), 3000);
+            } else {
+                const dateStr = lastAttempt ? lastAttempt.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : 'December 2024';
+                banner.classList.add('banner-amber');
+                msgEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Showing cached data &mdash; live database unavailable. Data as of ${dateStr}. Refresh to retry.`;
+            }
+            requestAnimationFrame(() => { requestAnimationFrame(() => { banner.classList.add('visible'); }); });
+        }
+
+        function dismissDataSourceBanner() {
+            if (_bannerEl) {
+                _bannerEl.classList.remove('visible');
+                setTimeout(() => { if (_bannerEl) _bannerEl.classList.remove('banner-amber', 'banner-green'); }, 350);
+            }
+            if (_bannerAutoDismissTimer) { clearTimeout(_bannerAutoDismissTimer); _bannerAutoDismissTimer = null; }
+        }
+
+        // E4: Map loading state
+        let _mapLoadingOverlay = null;
+
+        function showMapLoading(container) {
+            const currentPosition = window.getComputedStyle(container).position;
+            if (currentPosition === 'static') container.style.position = 'relative';
+            hideMapLoading();
+            _mapLoadingOverlay = document.createElement('div');
+            _mapLoadingOverlay.id = 'map-loading-overlay';
+            _mapLoadingOverlay.innerHTML = '<div class="map-spinner"></div><span class="map-loading-text">Loading map data&hellip;</span>';
+            container.appendChild(_mapLoadingOverlay);
+        }
+
+        function hideMapLoading() {
+            if (_mapLoadingOverlay && _mapLoadingOverlay.parentNode) _mapLoadingOverlay.parentNode.removeChild(_mapLoadingOverlay);
+            _mapLoadingOverlay = null;
+            const existing = document.getElementById('map-loading-overlay');
+            if (existing) existing.remove();
+        }
+
+        // E4: Map fallback table
+        let _fallbackSortKey = 'name';
+        let _fallbackSortAsc = true;
+
+        function _fallbackStatusStyle(status) {
+            if (!status || status === 'None') return { bg: '#e5e7eb', text: '#6b7280' };
+            if (status.includes('Mandatory')) return { bg: '#00953c', text: 'white' };
+            if (status.includes('Harmonized')) return { bg: '#005ca8', text: 'white' };
+            if (status.includes('Directive') || status.includes('Development')) return { bg: '#ff5721', text: 'white' };
+            return { bg: '#e5e7eb', text: '#6b7280' };
+        }
+
+        function _renderFallbackTable(container, countriesObj) {
+            const countries = Object.entries(countriesObj).map(([name, data]) => ({
+                name, region: data.region || '', region_secondary: data.region_secondary || '',
+                status: data.status || 'None', rac: data.rac || 'None',
+                refrigeration: data.refrigeration || 'None', lighting: data.lighting || 'None', motors: data.motors || 'None'
+            }));
+            countries.sort((a, b) => {
+                const cmp = (a[_fallbackSortKey] || '').localeCompare(b[_fallbackSortKey] || '');
+                return _fallbackSortAsc ? cmp : -cmp;
+            });
+            const columns = [
+                { key: 'name', label: 'Country', sortable: true },
+                { key: 'region', label: 'Region', sortable: true },
+                { key: 'status', label: 'MEPS Status', sortable: true },
+                { key: 'rac', label: 'AC (RAC)', sortable: false },
+                { key: 'refrigeration', label: 'Refrigerators', sortable: false },
+                { key: 'lighting', label: 'Lighting', sortable: false },
+                { key: 'motors', label: 'Motors', sortable: false }
+            ];
+            let thead = '<thead><tr>';
+            columns.forEach(col => {
+                if (col.sortable) {
+                    const isSorted = _fallbackSortKey === col.key;
+                    const indicator = isSorted ? (_fallbackSortAsc ? '&#9650;' : '&#9660;') : '&#8597;';
+                    thead += `<th class="sortable${isSorted?' sorted':''}" onclick="_fallbackSort('${col.key}',document.getElementById('map').parentElement,window._currentFallbackCountries)">${col.label} <span class="sort-indicator">${indicator}</span></th>`;
+                } else thead += `<th>${col.label}</th>`;
+            });
+            thead += '</tr></thead>';
+            let tbody = '<tbody>';
+            countries.forEach(c => {
+                const badge = _fallbackStatusStyle(c.status);
+                const regionDisplay = c.region_secondary ? `${c.region} / ${c.region_secondary}` : c.region;
+                tbody += `<tr onclick="showCountryPanel('${c.name.replace(/'/g,"\\'")}')"><td>${c.name}</td><td>${regionDisplay||'—'}</td><td><span class="status-pill" style="background:${badge.bg};color:${badge.text};">${c.status}</span></td><td>${c.rac==='None'?'<span style="color:#94a3b8;">—</span>':c.rac.replace('Regional ','Reg. ')}</td><td>${c.refrigeration==='None'?'<span style="color:#94a3b8;">—</span>':c.refrigeration.replace('Regional ','Reg. ')}</td><td>${c.lighting==='None'?'<span style="color:#94a3b8;">—</span>':c.lighting.replace('Regional ','Reg. ')}</td><td>${c.motors==='None'?'<span style="color:#94a3b8;">—</span>':c.motors.replace('Regional ','Reg. ')}</td></tr>`;
+            });
+            tbody += '</tbody>';
+            container.innerHTML = `<div class="fallback-notice"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Map could not be loaded. Showing country list instead. Click any row to view country details.</div><div id="map-fallback-table"><table class="fallback-table">${thead}${tbody}</table></div>`;
+        }
+
+        function _fallbackSort(key, container, countriesObj) {
+            if (_fallbackSortKey === key) _fallbackSortAsc = !_fallbackSortAsc;
+            else { _fallbackSortKey = key; _fallbackSortAsc = true; }
+            _renderFallbackTable(container, countriesObj);
+        }
+
+        function showMapFallback(countriesObj) {
+            hideMapLoading();
+            const mapDiv = document.getElementById('map');
+            if (!mapDiv) return;
+            d3.select('#map svg').remove();
+            window._currentFallbackCountries = countriesObj;
+            _renderFallbackTable(mapDiv, countriesObj);
+        }
+
+        // E4: GeoJSON fetch with retry
+        async function fetchGeoJSONWithRetry(url) {
+            const TIMEOUT_MS = 10000;
+            try {
+                console.log('[E4] GeoJSON fetch attempt 1:', url);
+                const response = await fetchWithTimeout(url, {}, TIMEOUT_MS);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (err) {
+                console.warn(`[E4] Attempt 1 failed: ${err.message}. Retrying...`);
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            try {
+                console.log('[E4] GeoJSON fetch attempt 2:', url);
+                const response = await fetchWithTimeout(url, {}, TIMEOUT_MS);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (err) {
+                console.error(`[E4] Attempt 2 failed: ${err.message}. Falling back to country table.`);
+                throw err;
+            }
+        }
+
+        // Fetch data from Supabase with 8s timeout (E4 enhanced)
         async function fetchCountryData() {
             if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('PASTE')) {
-                console.log('Supabase key not configured, using embedded data');
+                console.log('[E4] Supabase key not configured, using embedded data');
+                if (window.D3_setDBStatus) window.D3_setDBStatus(false);
                 return null;
             }
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/meps_country_data?select=*`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
+                const response = await fetchWithTimeout(
+                    `${SUPABASE_URL}/rest/v1/meps_country_data?select=*`,
+                    { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } },
+                    8000
+                );
 
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
 
-                // Transform to COUNTRY_DATA format
                 const countryData = {};
                 data.forEach(row => {
                     const motorsStatus = row.motors_status === 'Mandatory'
@@ -631,12 +1303,12 @@
 
                     countryData[row.country_name] = {
                         region: row.region,
+                        region_secondary: row.region_secondary || null,
                         status: row.meps_status,
                         motors: motorsStatus,
                         rac: row.rac_status,
                         lighting: row.lighting_status,
                         refrigeration: row.refrigeration_status,
-                        // Extended data from Supabase
                         rac_cspf_min: row.rac_cspf_min,
                         rac_cspf_target: row.rac_cspf_target,
                         refrigeration_eei_max: row.refrigeration_eei_max,
@@ -644,7 +1316,6 @@
                         lighting_efficacy_min: row.lighting_efficacy_min,
                         electricity_tariff: row.electricity_tariff,
                         grid_emission_factor: row.grid_emission_factor,
-                        // Energy savings data
                         ac_stock_thousands: row.ac_stock_thousands,
                         refrigerator_stock_thousands: row.refrigerator_stock_thousands,
                         total_savings_potential_gwh: row.total_savings_potential_gwh,
@@ -660,10 +1331,13 @@
                     };
                 });
 
-                console.log(`Loaded ${Object.keys(countryData).length} countries from Supabase`);
+                console.log(`[E4] Loaded ${Object.keys(countryData).length} countries from Supabase`);
+                if (window.D3_setDBStatus) window.D3_setDBStatus(true);
                 return countryData;
+
             } catch (err) {
-                console.error('Supabase fetch error:', err);
+                console.error('[E4] Supabase fetch error:', err.message);
+                if (window.D3_setDBStatus) window.D3_setDBStatus(false);
                 return null;
             }
         }
@@ -737,6 +1411,27 @@
             "Zambia": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Zimbabwe": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" }
         };
+
+        // E3: Region helpers for multi-region countries (Tanzania, DRC)
+        function getRegions(countryData) {
+            if (!countryData) return [];
+            const regions = [];
+            if (countryData.region) {
+                countryData.region.split(',').map(r => r.trim()).filter(r => r.length > 0).forEach(r => regions.push(r));
+            }
+            if (countryData.region_secondary) {
+                const sec = countryData.region_secondary.trim();
+                if (sec && !regions.includes(sec)) regions.push(sec);
+            }
+            return regions;
+        }
+        function getRegionLabel(countryData) {
+            const regions = getRegions(countryData);
+            return regions.length > 0 ? regions.join(' / ') : 'N/A';
+        }
+        function countryInRegion(countryData, regionCode) {
+            return getRegions(countryData).includes(regionCode);
+        }
 
         // Regional groupings
         const REGIONS = {
@@ -827,7 +1522,7 @@
 
             selectedCountry = countryName;
             document.getElementById('panel-country-name').textContent = countryName;
-            document.getElementById('panel-region').textContent = data.region || 'N/A';
+            document.getElementById('panel-region').textContent = getRegionLabel(data);
 
             // Status badges
             const statusBadge = getStatusBadge(data.status);
@@ -883,6 +1578,7 @@
 
             // Show panel
             document.getElementById('country-panel').classList.remove('hidden');
+            if (window.injectTagTooltips) window.injectTagTooltips(document.getElementById('country-panel'));
         }
 
         // Close country panel
@@ -908,7 +1604,7 @@
                 <div class="grid grid-cols-2 gap-6 mb-6">
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <div class="text-sm text-gray-500 mb-1">Region</div>
-                        <div class="font-semibold text-lg">${data.region || 'N/A'}</div>
+                        <div class="font-semibold text-lg">${getRegionLabel(data)}</div>
                     </div>
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <div class="text-sm text-gray-500 mb-1">MEPS Status</div>
@@ -1116,6 +1812,24 @@
             document.getElementById('modal-content').innerHTML = html;
             document.getElementById('country-modal').classList.remove('hidden');
             closePanel();
+
+            // D2: Completeness indicator
+            const completenessContainer = document.createElement('div');
+            completenessContainer.id = 'd2-completeness';
+            document.getElementById('modal-content').appendChild(completenessContainer);
+            if (window.D2_renderCompleteness) window.D2_renderCompleteness(data, completenessContainer);
+            // D3: Modal footer with last-verified
+            const footerContainer = document.createElement('div');
+            footerContainer.id = 'd3-modal-footer';
+            document.getElementById('modal-content').appendChild(footerContainer);
+            if (window.D3_renderModalFooter) window.D3_renderModalFooter(data, footerContainer);
+            // D6: Regional benchmark comparison
+            const d6Container = document.createElement('div');
+            d6Container.id = 'd6-benchmark-' + selectedCountry.replace(/\s+/g, '-').toLowerCase();
+            document.getElementById('modal-content').appendChild(d6Container);
+            if (window.D6_renderComparison) window.D6_renderComparison(selectedCountry, data, d6Container);
+            // Cross-cutting tag tooltips
+            if (window.injectTagTooltips) window.injectTagTooltips(document.getElementById('modal-content'));
         }
 
         // Close country modal
@@ -1134,7 +1848,8 @@
                 refrigeration: 'Refrigeration',
                 methodology: 'Calculation Methodology',
                 sources: 'Data Sources & Quality',
-                contacts: 'Regional Contacts'
+                contacts: 'Regional Contacts',
+                timeline: 'MEPS Implementation Timeline'
             };
             document.getElementById('title').textContent = titles[view] || 'Dashboard';
 
@@ -1152,11 +1867,13 @@
             const methodologySection = document.getElementById('section-methodology');
             const sourcesSection = document.getElementById('section-sources');
             const contactsSection = document.getElementById('section-contacts');
+            const timelineSection = document.getElementById('section-timeline');
 
             // Hide all content sections
             if (methodologySection) methodologySection.classList.add('hidden');
             if (sourcesSection) sourcesSection.classList.add('hidden');
             if (contactsSection) contactsSection.classList.add('hidden');
+            if (timelineSection) timelineSection.classList.add('hidden');
 
             if (mapViews.includes(view)) {
                 // Show map views
@@ -1164,6 +1881,7 @@
                 if (mapSection) mapSection.classList.remove('hidden');
                 updateStats();
                 updateMap();
+                if (window.D1_refreshMap) window.D1_refreshMap();
             } else {
                 // Hide map, show content section
                 if (statsSection) statsSection.classList.add('hidden');
@@ -1175,6 +1893,9 @@
                     sourcesSection.classList.remove('hidden');
                 } else if (view === 'contacts' && contactsSection) {
                     contactsSection.classList.remove('hidden');
+                } else if (view === 'timeline' && timelineSection) {
+                    timelineSection.classList.remove('hidden');
+                    if (window.D5_render) window.D5_render();
                 }
             }
         }
@@ -1208,27 +1929,28 @@
             };
         }
 
-        // Initialize map
+        // Initialize map (E4 enhanced with loading states)
         async function initMap() {
-            // Try to load from Supabase, fallback to embedded data
             const supabaseData = await fetchCountryData();
             COUNTRY_DATA = supabaseData || EMBEDDED_DATA;
-            console.log(`Using ${supabaseData ? 'Supabase' : 'embedded'} data (${Object.keys(COUNTRY_DATA).length} countries)`);
+            console.log(`[E4] Using ${supabaseData ? 'Supabase' : 'embedded'} data (${Object.keys(COUNTRY_DATA).length} countries)`);
 
-            // Wait for container to have dimensions
+            if (supabaseData) {
+                showDataSourceBanner('live', new Date());
+            } else {
+                showDataSourceBanner('cached', new Date('2024-12-18'));
+            }
+
             await new Promise(resolve => setTimeout(resolve, 100));
 
             const container = document.getElementById('map');
             let width = container.offsetWidth || 800;
             let height = container.offsetHeight || 500;
-
-            // If still no size, use fallback
             if (width < 100) width = 800;
             if (height < 100) height = 500;
 
-            console.log(`Map container: ${width}x${height}`);
+            console.log(`[E4] Map container: ${width}x${height}`);
 
-            // Clear any existing SVG
             d3.select('#map svg').remove();
 
             svg = d3.select('#map')
@@ -1238,15 +1960,28 @@
                 .attr('viewBox', `0 0 ${width} ${height}`)
                 .attr('preserveAspectRatio', 'xMidYMid meet');
 
+            showMapLoading(container);
+
             try {
-                geoData = await d3.json('./africa.geojson');
+                const GEOJSON_URL = 'africa.geojson';
+                const GEOJSON_FALLBACK = 'https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/africa.geojson';
+                let geoJsonUrl = GEOJSON_URL;
+                try {
+                    const probe = await fetchWithTimeout(GEOJSON_URL, {}, 3000);
+                    if (!probe.ok) throw new Error('Local GeoJSON not available');
+                } catch (_) {
+                    console.warn('[E4] Self-hosted africa.geojson not found, using GitHub CDN fallback');
+                    geoJsonUrl = GEOJSON_FALLBACK;
+                }
+
+                geoData = await fetchGeoJSONWithRetry(geoJsonUrl);
+                hideMapLoading();
 
                 const projection = d3.geoMercator()
                     .fitExtent([[10, 10], [width - 10, height - 10]], geoData);
 
                 path = d3.geoPath().projection(projection);
 
-                // Draw countries
                 svg.selectAll('path.country')
                     .data(geoData.features)
                     .enter()
@@ -1259,7 +1994,6 @@
                     .style('cursor', 'pointer')
                     .on('mouseenter', function(event, d) {
                         d3.select(this).attr('stroke', HEAT.blue800).attr('stroke-width', 1.5);
-                        const data = COUNTRY_DATA[d.properties.name];
                         tooltip.innerHTML = `<strong>${d.properties.name}</strong><br>Click for details`;
                         tooltip.style.opacity = 1;
                     })
@@ -1272,50 +2006,858 @@
                         tooltip.style.opacity = 0;
                     })
                     .on('click', function(event, d) {
-                        showCountryPanel(d.properties.name);
+                        const canonicalName = window.normaliseGeoName ? window.normaliseGeoName(d.properties.name) : d.properties.name;
+                        showCountryPanel(canonicalName);
                     });
 
-                // Draw regional boundaries (merged outlines)
                 Object.entries(REGIONS).forEach(([regionName, countries]) => {
                     const regionFeatures = geoData.features.filter(f => countries.includes(f.properties.name));
                     if (regionFeatures.length === 0) return;
-
                     const mergedRegion = mergeRegionGeometries(regionFeatures);
                     const style = REGION_STYLES[regionName];
-
-                    // White background stroke for contrast
-                    svg.append('path')
-                        .datum(mergedRegion)
-                        .attr('class', `region-bg region-${regionName}-bg`)
-                        .attr('d', path)
-                        .attr('fill', 'none')
-                        .attr('stroke', '#ffffff')
-                        .attr('stroke-width', style.width + 3)
-                        .attr('stroke-linejoin', 'round')
-                        .style('pointer-events', 'none');
-
-                    // Colored dashed stroke
-                    svg.append('path')
-                        .datum(mergedRegion)
-                        .attr('class', `region-boundary region-${regionName}`)
-                        .attr('d', path)
-                        .attr('fill', 'none')
-                        .attr('stroke', style.color)
-                        .attr('stroke-width', style.width)
-                        .attr('stroke-dasharray', style.dash)
-                        .attr('stroke-linejoin', 'round')
-                        .attr('stroke-linecap', 'round')
-                        .style('pointer-events', 'none');
+                    svg.append('path').datum(mergedRegion)
+                        .attr('class', `region-bg region-${regionName}-bg`).attr('d', path)
+                        .attr('fill', 'none').attr('stroke', '#ffffff').attr('stroke-width', style.width + 3)
+                        .attr('stroke-linejoin', 'round').style('pointer-events', 'none');
+                    svg.append('path').datum(mergedRegion)
+                        .attr('class', `region-boundary region-${regionName}`).attr('d', path)
+                        .attr('fill', 'none').attr('stroke', style.color).attr('stroke-width', style.width)
+                        .attr('stroke-dasharray', style.dash).attr('stroke-linejoin', 'round')
+                        .attr('stroke-linecap', 'round').style('pointer-events', 'none');
                 });
 
                 updateStats();
+
             } catch (error) {
-                console.error('Failed to load map:', error);
-                container.innerHTML = '<p style="color: var(--heat-red); padding: 1rem;">Failed to load map data</p>';
+                console.error('[E4] All GeoJSON attempts failed, showing country table fallback:', error);
+                hideMapLoading();
+                d3.select('#map svg').remove();
+                showMapFallback(COUNTRY_DATA);
             }
         }
 
         // Map initialization is triggered by password check or session restore
+
+        // ================================================================
+        // D — Cross-Cutting Utilities
+        // ================================================================
+        (function () {
+          'use strict';
+          const GEOJSON_NAME_MAP = {
+            'DR Congo':   'Democratic Republic of the Congo',
+            'Ivory Coast': 'Cote d\'Ivoire',
+            'Swaziland':  'Eswatini',
+            'Cape Verde': 'Cabo Verde'
+          };
+          function normaliseGeoName(geoName) {
+            return GEOJSON_NAME_MAP[geoName] || geoName;
+          }
+          window.GEOJSON_NAME_MAP   = GEOJSON_NAME_MAP;
+          window.normaliseGeoName   = normaliseGeoName;
+          const APPLIANCE_LABEL_MAP = {
+            'Cooling':       'Room Air Conditioners (RAC)',
+            'Refrigeration': 'Domestic Refrigerators'
+          };
+          function renameApplianceLabel(label) {
+            if (!label) return label;
+            return APPLIANCE_LABEL_MAP[label] || label;
+          }
+          function applyApplianceLabelRenames() {
+            const SAFE_SELECTORS = [
+              '.nav-link',
+              '#section-methodology',
+              '#section-sources',
+              '.panel-section-title',
+              '.appliance-label',
+              '.stat-card-title',
+              '[data-appliance-label]'
+            ];
+            SAFE_SELECTORS.forEach(sel => {
+              document.querySelectorAll(sel).forEach(el => {
+                el.childNodes.forEach(node => {
+                  if (node.nodeType === Node.TEXT_NODE) {
+                    const trimmed = node.textContent.trim();
+                    const renamed = renameApplianceLabel(trimmed);
+                    if (renamed !== trimmed) {
+                      node.textContent = node.textContent.replace(trimmed, renamed);
+                    }
+                  }
+                });
+              });
+            });
+            document.querySelectorAll('[aria-label], [title]').forEach(el => {
+              ['aria-label', 'title'].forEach(attr => {
+                const val = el.getAttribute(attr);
+                if (!val) return;
+                const renamed = Object.entries(APPLIANCE_LABEL_MAP).reduce(
+                  (acc, [old, neo]) => acc.replace(new RegExp(`\\b${old}\\b`, 'g'), neo),
+                  val
+                );
+                if (renamed !== val) el.setAttribute(attr, renamed);
+              });
+            });
+            console.log('D-CC: Appliance label renames applied.');
+          }
+          window.APPLIANCE_LABEL_MAP      = APPLIANCE_LABEL_MAP;
+          window.renameApplianceLabel      = renameApplianceLabel;
+          window.applyApplianceLabelRenames = applyApplianceLabelRenames;
+          const TAG_TOOLTIP_TEXT = {
+            'Mandatory': 'This country has an active, enforced MEPS regulation. Imports or sales of non-compliant products face regulatory controls. Enforcement strength varies — see the Enforcement Level indicator for details.',
+            'Regional (Harmonized)': 'This country\'s regional body has adopted a formal harmonized standard. The country is on a compliance pathway but has not yet enacted or enforced it nationally.',
+            'Regional (Harmonised)': 'This country\'s regional body has adopted a formal harmonized standard. The country is on a compliance pathway but has not yet enacted or enforced it nationally.',
+            'Regional (Development)': 'This country\'s regional body is developing a harmonized standard — not yet adopted. No national MEPS exists for this product category.',
+            'Regional Directive': 'ECOWAS has issued a binding directive for this product. This country must transpose it into national law but has not yet done so or begun enforcement.',
+            'None — No Standard': 'Confirmed: no MEPS exists for this country and product category at national or regional level. Source verified.',
+            'None — Data Unavailable': 'No verified information found. A standard may exist but could not be confirmed. This is a research gap, not a confirmed absence.',
+            'Harmonized': 'This country\'s regional body has adopted a formal harmonized standard. Not yet enforced nationally.',
+            'Development': 'Regional body is developing a harmonized standard — not yet adopted. No national MEPS exists for this category.',
+            'Directive': 'ECOWAS has issued a binding directive. National transposition pending.',
+            'None': 'No MEPS standard found for this country and product category.'
+          };
+          function getTagTooltip(statusValue) {
+            if (!statusValue) return null;
+            if (TAG_TOOLTIP_TEXT[statusValue]) return TAG_TOOLTIP_TEXT[statusValue];
+            const key = Object.keys(TAG_TOOLTIP_TEXT).find(k => statusValue.includes(k));
+            return key ? TAG_TOOLTIP_TEXT[key] : null;
+          }
+          function buildTagTooltipIcon(statusValue) {
+            const text = getTagTooltip(statusValue);
+            if (!text) return null;
+            const span = document.createElement('span');
+            span.className    = 'd-cc-tag-tooltip-icon status-info-icon';
+            span.textContent  = '?';
+            span.title        = text;
+            span.setAttribute('aria-label', 'Status definition');
+            span.setAttribute('role', 'tooltip');
+            span.setAttribute('tabindex', '0');
+            span.addEventListener('keydown', e => {
+              if (e.key === 'Enter' || e.key === ' ') { alert(text); }
+            });
+            return span;
+          }
+          function injectTagTooltips(rootEl) {
+            if (!rootEl) return;
+            const candidates = rootEl.querySelectorAll(
+              '[id*="panel-status"], [id*="panel-rac"], [id*="panel-refrigeration"], ' +
+              '[id*="panel-lighting"], [id*="panel-motors"], ' +
+              '.meps-status-badge, .appliance-status-badge, .d6-badge'
+            );
+            candidates.forEach(el => {
+              if (el.querySelector('.d-cc-tag-tooltip-icon')) return;
+              if (el.classList.contains('d6-badge')) return;
+              const statusText = el.textContent.trim();
+              const icon = buildTagTooltipIcon(statusText);
+              if (icon) { el.appendChild(icon); }
+            });
+          }
+          window.TAG_TOOLTIP_TEXT   = TAG_TOOLTIP_TEXT;
+          window.getTagTooltip       = getTagTooltip;
+          window.buildTagTooltipIcon = buildTagTooltipIcon;
+          window.injectTagTooltips   = injectTagTooltips;
+          function init() {
+            setTimeout(applyApplianceLabelRenames, 600);
+            console.log('D-CC: Cross-cutting utilities loaded (GeoJSON map, label renames, tag tooltips).');
+          }
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+          } else {
+            init();
+          }
+        })();
+
+        // ================================================================
+        // D1 — Country Search + Regional Filter Bar
+        // ================================================================
+        (function () {
+          'use strict';
+          let activeRegion = 'ALL';
+          let searchTerm   = '';
+          function injectSearchBar() {
+            const container = document.getElementById('d1-search-bar-container');
+            if (!container) { console.warn('D1: #d1-search-bar-container not found'); return; }
+            container.innerHTML = `
+              <div class="d1-search-bar" role="search" aria-label="Country search and regional filter">
+                <div class="d1-search-input-wrapper">
+                  <span class="d1-search-icon" aria-hidden="true">&#128269;</span>
+                  <input id="d1-country-search" type="text" placeholder="Search country…" autocomplete="off" aria-label="Search country by name" class="d1-input" />
+                  <button id="d1-clear-search" class="d1-clear-btn" aria-label="Clear search" title="Clear search" style="display:none;">&#10005;</button>
+                </div>
+                <div class="d1-region-filters" role="group" aria-label="Filter by regional bloc">
+                  <button class="d1-region-btn d1-region-btn--active" data-region="ALL"   aria-pressed="true">All Africa</button>
+                  <button class="d1-region-btn" data-region="SADC"   aria-pressed="false">SADC</button>
+                  <button class="d1-region-btn" data-region="ECOWAS" aria-pressed="false">ECOWAS</button>
+                  <button class="d1-region-btn" data-region="EAC"    aria-pressed="false">EAC</button>
+                </div>
+                <span id="d1-result-count" class="d1-result-count" aria-live="polite"></span>
+              </div>
+            `;
+          }
+          function getVisibleCountries() {
+            const allNames = Object.keys(window.COUNTRY_DATA || {});
+            return allNames.filter(name => {
+              if (activeRegion !== 'ALL') {
+                const members = (window.REGIONS && window.REGIONS[activeRegion]) || [];
+                if (!members.includes(name)) return false;
+              }
+              if (searchTerm) { return name.toLowerCase().includes(searchTerm.toLowerCase()); }
+              return true;
+            });
+          }
+          function applyMapFilter(visibleCountries) {
+            const visibleSet = new Set(visibleCountries);
+            const svgEl = d3.select('#map').select('svg');
+            if (svgEl.empty()) return;
+            svgEl.selectAll('path').each(function (d) {
+              if (!d || !d.properties) return;
+              const name = d.properties.name;
+              const pathEl = d3.select(this);
+              const inVisible = visibleSet.has(name);
+              if (inVisible) {
+                const status = (typeof window.getStatus === 'function') ? window.getStatus(name) : 'None';
+                pathEl.attr('fill', (typeof window.getColor === 'function') ? window.getColor(status) : '#cbd5e1').attr('opacity', 1).attr('stroke', '#fff').attr('stroke-width', 0.5);
+              } else {
+                pathEl.attr('fill', '#e2e8f0').attr('opacity', 0.35).attr('stroke', '#cbd5e1').attr('stroke-width', 0.3);
+              }
+            });
+          }
+          function updateStatsCards(visibleCountries) {
+            const counts = { mandatory: 0, regional: 0, dev: 0, none: 0 };
+            const data = window.COUNTRY_DATA || {};
+            visibleCountries.forEach(name => {
+              const d = data[name];
+              if (!d) return;
+              const s = (d.status || '').toLowerCase();
+              if (s.includes('mandatory')) counts.mandatory++;
+              else if (s.includes('harmonized') || s.includes('harmonised') || s.includes('directive')) counts.regional++;
+              else if (s.includes('development')) counts.dev++;
+              else counts.none++;
+            });
+            const safe = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            safe('stat-mandatory', counts.mandatory);
+            safe('stat-regional',  counts.regional);
+            safe('stat-dev',       counts.dev);
+            safe('stat-none',      counts.none);
+          }
+          function updateResultCount(visibleCountries) {
+            const el = document.getElementById('d1-result-count');
+            if (!el) return;
+            const total = Object.keys(window.COUNTRY_DATA || {}).length;
+            el.textContent = (activeRegion === 'ALL' && !searchTerm) ? '' : `${visibleCountries.length} of ${total} countries`;
+          }
+          function applyFilters() {
+            const visible = getVisibleCountries();
+            applyMapFilter(visible);
+            updateStatsCards(visible);
+            updateResultCount(visible);
+            if (searchTerm && visible.length === 1 && typeof window.showCountryPanel === 'function') {
+              window.showCountryPanel(visible[0]);
+            }
+          }
+          function attachListeners() {
+            const searchInput = document.getElementById('d1-country-search');
+            const clearBtn    = document.getElementById('d1-clear-search');
+            if (searchInput) {
+              searchInput.addEventListener('input', function () {
+                searchTerm = this.value.trim();
+                clearBtn.style.display = searchTerm ? 'inline-flex' : 'none';
+                applyFilters();
+              });
+              searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { this.value = ''; searchTerm = ''; clearBtn.style.display = 'none'; applyFilters(); }
+              });
+            }
+            if (clearBtn) {
+              clearBtn.addEventListener('click', function () {
+                const inp = document.getElementById('d1-country-search');
+                if (inp) inp.value = '';
+                searchTerm = '';
+                this.style.display = 'none';
+                applyFilters();
+              });
+            }
+            document.querySelectorAll('.d1-region-btn').forEach(btn => {
+              btn.addEventListener('click', function () {
+                activeRegion = this.dataset.region;
+                document.querySelectorAll('.d1-region-btn').forEach(b => { b.classList.remove('d1-region-btn--active'); b.setAttribute('aria-pressed', 'false'); });
+                this.classList.add('d1-region-btn--active');
+                this.setAttribute('aria-pressed', 'true');
+                applyFilters();
+              });
+            });
+          }
+          window.D1_resetFilters = function () {
+            activeRegion = 'ALL'; searchTerm = '';
+            const inp = document.getElementById('d1-country-search');
+            const clr = document.getElementById('d1-clear-search');
+            if (inp) inp.value = '';
+            if (clr) clr.style.display = 'none';
+            document.querySelectorAll('.d1-region-btn').forEach(b => { b.classList.remove('d1-region-btn--active'); b.setAttribute('aria-pressed', 'false'); });
+            const allBtn = document.querySelector('.d1-region-btn[data-region="ALL"]');
+            if (allBtn) { allBtn.classList.add('d1-region-btn--active'); allBtn.setAttribute('aria-pressed', 'true'); }
+            applyFilters();
+          };
+          window.D1_refreshMap = function () { applyFilters(); };
+          function init() {
+            injectSearchBar();
+            attachListeners();
+            applyFilters();
+            console.log('D1: Search + Filter bar initialised.');
+          }
+          if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+          else { setTimeout(init, 300); }
+        })();
+
+        // ================================================================
+        // D2 — Data Completeness Indicator
+        // ================================================================
+        (function () {
+          'use strict';
+          const COMPLETENESS_FIELDS = [
+            { key: 'rac_cspf_min', label: 'AC CSPF minimum', description: 'Minimum CSPF value for room air conditioners' },
+            { key: 'refrigeration_eei_max', label: 'Refrigerator EEI maximum', description: 'Maximum EEI value for domestic refrigerators' },
+            { key: 'lighting_efficacy_min', label: 'Lighting efficacy minimum', description: 'Minimum lm/W value for LED lighting' },
+            { key: 'motors_level', label: 'Motors IE class', description: 'Minimum IE efficiency class for electric motors' },
+            { key: 'electricity_tariff', label: 'Electricity tariff', description: 'National electricity tariff (USD/kWh) — used in savings calculations' },
+            { key: 'grid_emission_factor', label: 'Grid emission factor', description: 'Grid carbon intensity (tCO₂/MWh) — used in GHG calculations' },
+            { key: 'last_verified', label: 'Last verified date', description: 'Date this country record was last reviewed against primary sources' }
+          ];
+          function calculateCompleteness(data) {
+            const presentFields = [], missingFields = [];
+            COMPLETENESS_FIELDS.forEach(field => {
+              const val = data[field.key];
+              if (val !== null && val !== undefined && val !== '' && val !== 'N/A') { presentFields.push(field); }
+              else { missingFields.push(field); }
+            });
+            return { score: presentFields.length, total: COMPLETENESS_FIELDS.length, presentFields, missingFields };
+          }
+          function buildDotMeter(score, total) {
+            let dots = '';
+            for (let i = 0; i < total; i++) {
+              dots += i < score
+                ? `<span class="d2-dot d2-dot--filled" aria-hidden="true">&#9679;</span>`
+                : `<span class="d2-dot d2-dot--empty"  aria-hidden="true">&#9675;</span>`;
+            }
+            return dots;
+          }
+          function buildTooltipContent(missingFields) {
+            if (missingFields.length === 0) return 'All data fields are verified for this country.';
+            return `Missing fields (${missingFields.length}):\n${missingFields.map(f => `• ${f.label}: ${f.description}`).join('\n')}`;
+          }
+          function renderCompleteness(data, containerEl) {
+            if (!containerEl) return;
+            const { score, total, missingFields } = calculateCompleteness(data);
+            const pct = Math.round((score / total) * 100);
+            let colourClass = 'd2-meter--green';
+            if (score < 4) colourClass = 'd2-meter--red';
+            else if (score < 6) colourClass = 'd2-meter--amber';
+            const tooltipText = buildTooltipContent(missingFields);
+            const dotMeterHTML = buildDotMeter(score, total);
+            const missingListHTML = missingFields.length > 0
+              ? `<ul class="d2-missing-list">${missingFields.map(f => `<li><strong>${f.label}</strong> — ${f.description}</li>`).join('')}</ul>`
+              : `<p class="d2-all-present">All ${total} data fields are verified.</p>`;
+            containerEl.innerHTML = `
+              <div class="d2-completeness-widget ${colourClass}">
+                <div class="d2-header">
+                  <span class="d2-title">Data completeness</span>
+                  <span class="d2-score-badge">${score}/${total} fields</span>
+                  <button class="d2-info-btn" aria-label="Show missing data fields" title="${tooltipText}" onclick="this.closest('.d2-completeness-widget').querySelector('.d2-detail-panel').classList.toggle('d2-detail-panel--open')">?</button>
+                </div>
+                <div class="d2-dot-row" role="img" aria-label="${score} of ${total} data fields present (${pct}%)">${dotMeterHTML}<span class="d2-pct-label">${pct}%</span></div>
+                <div class="d2-detail-panel">
+                  <p class="d2-detail-title">${missingFields.length > 0 ? `${missingFields.length} field${missingFields.length > 1 ? 's' : ''} missing or unverified:` : ''}</p>
+                  ${missingListHTML}
+                </div>
+              </div>
+            `;
+          }
+          window.D2_renderCompleteness = renderCompleteness;
+          window.D2_calculateCompleteness = calculateCompleteness;
+          console.log('D2: Completeness indicator module loaded.');
+        })();
+
+        // ================================================================
+        // D3 — Live DB Badge + Last-Verified in Modal
+        // ================================================================
+        (function () {
+          'use strict';
+          let _isLive = null;
+          function injectBadge() {
+            const container = document.getElementById('d3-db-badge-container');
+            if (!container) {
+              const badge = document.createElement('div');
+              badge.id = 'd3-db-badge';
+              badge.className = 'd3-badge d3-badge--pending';
+              badge.innerHTML = '<span class="d3-badge-dot">●</span> Connecting…';
+              badge.title = 'Database connection status';
+              badge.setAttribute('aria-label', 'Database connection status');
+              badge.setAttribute('role', 'status');
+              badge.setAttribute('aria-live', 'polite');
+              badge.style.cssText = 'position:fixed;top:12px;right:16px;z-index:9999';
+              document.body.appendChild(badge);
+              return badge;
+            }
+            container.innerHTML = `<div id="d3-db-badge" class="d3-badge d3-badge--pending" role="status" aria-live="polite" title="Database connection status" aria-label="Database connection status"><span class="d3-badge-dot">●</span> Connecting…</div>`;
+            return document.getElementById('d3-db-badge');
+          }
+          function updateBadge(isLive) {
+            const badge = document.getElementById('d3-db-badge');
+            if (!badge) return;
+            if (isLive) {
+              badge.className = 'd3-badge d3-badge--live';
+              badge.innerHTML = '<span class="d3-badge-dot">●</span> Live DB';
+              badge.title = 'Data loaded from Supabase (live database)';
+              badge.setAttribute('aria-label', 'Database status: Live DB connected');
+            } else {
+              badge.className = 'd3-badge d3-badge--cached';
+              badge.innerHTML = '<span class="d3-badge-dot">●</span> Cached data';
+              badge.title = 'Supabase unavailable — using embedded fallback data';
+              badge.setAttribute('aria-label', 'Database status: Using cached embedded data');
+            }
+          }
+          function formatVerifiedDate(rawDate) {
+            if (!rawDate) return null;
+            try {
+              const d = new Date(rawDate);
+              if (isNaN(d.getTime())) return null;
+              return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+            } catch (e) { return null; }
+          }
+          function isOutdated(rawDate) {
+            if (!rawDate) return false;
+            try {
+              const d = new Date(rawDate);
+              if (isNaN(d.getTime())) return false;
+              const cutoff = new Date();
+              cutoff.setMonth(cutoff.getMonth() - 24);
+              return d < cutoff;
+            } catch (e) { return false; }
+          }
+          function renderModalFooter(data, containerEl) {
+            if (!containerEl) return;
+            let sourceText = 'N/A';
+            if (data.data_sources) {
+              try {
+                const parsed = typeof data.data_sources === 'string' ? JSON.parse(data.data_sources) : data.data_sources;
+                sourceText = Array.isArray(parsed) ? parsed.join('; ') : String(parsed);
+              } catch (_) { sourceText = String(data.data_sources); }
+            } else if (data.data_source) { sourceText = String(data.data_source); }
+            const verifiedRaw = data.last_verified || data.lastVerified || null;
+            const verifiedFmt = formatVerifiedDate(verifiedRaw);
+            const outdated    = isOutdated(verifiedRaw);
+            const verifiedStr = verifiedFmt ? `Verified: ${verifiedFmt}` : 'Verification date: unknown';
+            const outdatedBanner = outdated ? `<div class="d3-outdated-warning" role="alert">⚠ Data may be outdated — last verified over 24 months ago. Please verify against current national or regional sources.</div>` : '';
+            containerEl.innerHTML = `
+              <div class="d3-modal-footer">
+                ${outdatedBanner}
+                <p class="d3-source-line">
+                  <span class="d3-source-label">Source:</span>
+                  <span class="d3-source-value">${sourceText}</span>
+                  <span class="d3-source-sep">|</span>
+                  <span class="d3-verified-value">${verifiedStr}</span>
+                </p>
+              </div>
+            `;
+          }
+          window.D3_setDBStatus = function (isLive) {
+            _isLive = Boolean(isLive);
+            updateBadge(_isLive);
+            console.log(`D3: DB status set to ${_isLive ? 'LIVE' : 'CACHED'}`);
+          };
+          window.D3_renderModalFooter = renderModalFooter;
+          window.D3_isLive = function () { return _isLive; };
+          function init() {
+            injectBadge();
+            console.log('D3: Live DB badge module loaded.');
+          }
+          if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+          else { init(); }
+        })();
+
+        // ================================================================
+        // D4 — Export to CSV
+        // ================================================================
+        (function () {
+          'use strict';
+          const EXPORT_COLUMNS = [
+            { header: 'Country Name',              key: 'country_name' },
+            { header: 'Region',                    key: 'region' },
+            { header: 'Overall MEPS Status',       key: 'status' },
+            { header: 'RAC CSPF Minimum',          key: 'rac_cspf_min' },
+            { header: 'RAC CSPF Target',           key: 'rac_cspf_target' },
+            { header: 'Refrigerator EEI Maximum',  key: 'refrigeration_eei_max' },
+            { header: 'Lighting Efficacy Min (lm/W)', key: 'lighting_efficacy_min' },
+            { header: 'Motors IE Level',           key: 'motors_level' },
+            { header: 'Electricity Tariff (USD/kWh)', key: 'electricity_tariff' },
+            { header: 'Grid Emission Factor (tCO2/MWh)', key: 'grid_emission_factor' },
+            { header: 'Last Verified',             key: 'last_verified' },
+            { header: 'RAC Status',               key: 'rac' },
+            { header: 'Refrigeration Status',     key: 'refrigeration' },
+            { header: 'Lighting Status',          key: 'lighting' },
+            { header: 'Motors Status',            key: 'motors' }
+          ];
+          function csvEscape(val) {
+            if (val === null || val === undefined) return '';
+            const str = String(val);
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) { return '"' + str.replace(/"/g, '""') + '"'; }
+            return str;
+          }
+          function buildCSV() {
+            const data = window.COUNTRY_DATA || {};
+            const headers = EXPORT_COLUMNS.map(c => csvEscape(c.header));
+            const rows = [headers.join(',')];
+            Object.entries(data).sort(([a], [b]) => a.localeCompare(b)).forEach(([countryName, countryObj]) => {
+              const row = EXPORT_COLUMNS.map(col => col.key === 'country_name' ? csvEscape(countryName) : csvEscape(countryObj[col.key]));
+              rows.push(row.join(','));
+            });
+            return rows.join('\r\n');
+          }
+          function getTodayString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+          }
+          function triggerDownload(csvString, filename) {
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const url  = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url; link.download = filename; link.style.display = 'none';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+          }
+          function handleExportClick() {
+            const countryCount = Object.keys(window.COUNTRY_DATA || {}).length;
+            if (countryCount === 0) { alert('No country data available to export.'); return; }
+            try {
+              triggerDownload(buildCSV(), `AU-MEPS-Data-${getTodayString()}.csv`);
+              console.log(`D4: Exported ${countryCount} countries`);
+            } catch (err) { console.error('D4: CSV export failed:', err); alert('Export failed. See console.'); }
+          }
+          function injectButton() {
+            let container = document.getElementById('d4-export-btn-container');
+            if (!container) {
+              const statMandatory = document.getElementById('stat-mandatory');
+              if (statMandatory) {
+                const statsGrid = statMandatory.closest('[class*="grid"]') || statMandatory.parentElement;
+                if (statsGrid && statsGrid.parentElement) {
+                  container = document.createElement('div');
+                  container.id = 'd4-export-btn-container';
+                  statsGrid.parentElement.insertBefore(container, statsGrid.nextSibling);
+                }
+              }
+            }
+            if (!container) { console.warn('D4: Could not find container for export button.'); return; }
+            container.innerHTML = `
+              <div class="d4-export-bar">
+                <button id="d4-export-btn" class="d4-export-btn" aria-label="Download all country MEPS data as CSV">
+                  <span class="d4-export-icon">&#8595;</span> Download CSV
+                </button>
+                <span class="d4-export-help">All ${Object.keys(window.COUNTRY_DATA || {}).length} countries &middot; 15 fields</span>
+              </div>
+            `;
+            const btn = document.getElementById('d4-export-btn');
+            if (btn) { btn.addEventListener('click', handleExportClick); }
+          }
+          window.D4_injectButton = injectButton;
+          window.D4_exportCSV = handleExportClick;
+          function init() { setTimeout(injectButton, 500); console.log('D4: CSV Export module loaded.'); }
+          if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+          else { init(); }
+        })();
+
+        // ================================================================
+        // D5 — Implementation Timeline
+        // ================================================================
+        (function () {
+          'use strict';
+          const TODAY = new Date();
+          function isPast(dateStr) { return new Date(dateStr) <= TODAY; }
+          const TIMELINE_EVENTS = [
+            { id: 'sadc_ht110_approved', row: 'SADC', date: '2024-02-01', label: 'SADC HT 110:2023\napproved', detail: 'SADC HT 110:2023 (AC CSPF ≥ 4.5) formally approved by SADC Secretariat, Gaborone. Applies to split-type non-ducted AC ≤14 kW. CSPF measured per ISO 16358-1:2013.', value: 'CSPF 4.5', shape: 'diamond' },
+            { id: 'sadc_ht111_approved', row: 'SADC', date: '2024-02-01', label: 'SADC HT 111:2023\napproved', detail: 'SADC HT 111:2023 (Refrigerator EEI ≤ 120) formally approved. Applies to household refrigerators and freezers ≤ 500 L. Testing per IEC 62552-3.', value: 'EEI 120', shape: 'circle', offsetY: 20 },
+            { id: 'mauritius_enforcement', row: 'SADC', date: '2025-09-01', label: 'Mauritius CSPF 4.5\nenforcing', detail: 'Mauritius becomes first SADC member to begin active enforcement of CSPF 4.5 standard. Import controls at border, market surveillance sampling active. Enforcement level: L1.', value: 'CSPF 4.5 enforced', shape: 'diamond' },
+            { id: 'sadc_phase2_target', row: 'SADC', date: '2027-01-01', label: 'SADC Phase 2\nCSPF 6.1 target', detail: 'SADC HT 110 Phase 2 tightening target: CSPF ≥ 6.1. Announced as future target — exact gazette date to be confirmed by SADC Secretariat. Confidence: reported.', value: 'CSPF 6.1', shape: 'diamond' },
+            { id: 'eac_eas1213_gazetted', row: 'EAC', date: '2025-07-01', label: 'EAC EAS 1213:2025\ngazetted (AC)', detail: 'EAC EAS 1213:2025 gazetted July 2025 by EAC Standards Committee. Phase 1: CSPF ≈ 4.5 for split-type non-ducted AC. Applies to 6 EAC partner states. Jan 2026: partner state adoption deadline.', value: 'CSPF ≈ 4.5', shape: 'diamond' },
+            { id: 'eac_eas1212_gazetted', row: 'EAC', date: '2025-07-01', label: 'EAC EAS 1212:2025\ngazetted (Ref.)', detail: 'EAC EAS 1212:2025 gazetted July 2025. Phase 1 refrigerator EEI threshold ≈ 120 (aligned with SADC HT 111:2023). Verification against official EAC gazette document pending.', value: 'EEI ≈ 120', shape: 'circle', offsetY: 20 },
+            { id: 'eac_adoption_deadline', row: 'EAC', date: '2026-01-01', label: 'EAC partner state\nadoption deadline', detail: 'Deadline for all EAC partner states (Kenya, Rwanda, Tanzania, Uganda, Burundi, South Sudan, Somalia) to individually adopt EAS 1213:2025 and EAS 1212:2025 into national law.', value: 'Regional harmonisation', shape: 'circle' },
+            { id: 'eac_phase2', row: 'EAC', date: '2027-01-01', label: 'EAC Phase 2\nCSPF 6.1 target', detail: 'EAC EAS 1213 Phase 2 tightening: CSPF target ≈ 6.1. Aligned with SADC Phase 2. Exact effective date subject to EAC member state review.', value: 'CSPF 6.1', shape: 'diamond' },
+            { id: 'ghana_meps_li2458', row: 'ECOWAS', date: '2020-01-01', label: 'Ghana LI 2458\nAC MEPS enacted', detail: 'Ghana Legislative Instrument 2458 enacted. AC MEPS: EER ≥ 2.8 (CSPF equiv. ≈ 3.0). Also covers refrigerators and lighting.', value: 'EER 2.8 (CSPF ≈ 3.0)', shape: 'circle' },
+            { id: 'ghana_enforcement', row: 'ECOWAS', date: '2025-12-01', label: 'Ghana enforcement\nintensifies', detail: 'Ghana Energy Commission intensifies enforcement of LI 2458. Market seizures of non-compliant AC units begin. ECOWAS member using national standard rather than awaiting directive transposition.', value: 'National enforcement', shape: 'diamond' },
+            { id: 'nigeria_nseer_workshop', row: 'ECOWAS', date: '2025-06-01', label: 'Nigeria NSEER\ncapacity workshop', detail: 'Nigeria Standards Organisation (SON) holds compliance support workshop for NSEER (National Seasonal Energy Efficiency Rating). Climate bins: hot-humid ≥ 3.3, hot-dry ≥ 2.8, mixed ≥ 3.0. Metric diverges from ECOWAS CSPF directive.', value: 'NSEER baseline', shape: 'circle' },
+            { id: 'ecowas_regional_tier1', row: 'ECOWAS', date: '2030-01-01', label: 'ECOWAS\nTier 1 target', detail: 'ECOWAS regional AC MEPS Tier 1 target: CSPF ≈ 4.5. Projected based on ECOWAS energy efficiency programme roadmap. Confirmation from ECOWAS Energy and Mines Directorate pending.', value: 'CSPF ≈ 4.5 (projected)', shape: 'diamond' },
+            { id: 'southafrica_sans941', row: 'National', date: '2020-01-01', label: 'South Africa\nSANS 941 CSPF 3.0', detail: 'South Africa SANS 941 sets CSPF 3.0 minimum for AC. First SADC member to have a national standard. Currently domesticating SADC HT 110:2023 Phase 1 (CSPF 4.5).', value: 'CSPF 3.0', shape: 'circle' },
+            { id: 'kenya_eac_ph1', row: 'National', date: '2025-07-01', label: 'Kenya adopts\nEAC Phase 1', detail: 'Kenya, founding EAC member, adopts EAS 1213:2025 Phase 1. Previous national standard: CSPF 3.1. Phase 2 (CSPF 6.1) represents a ~97% improvement by 2027.', value: 'CSPF 3.1 → 4.5', shape: 'diamond' },
+            { id: 'sadc_eac_tier2', row: 'National', date: '2027-01-01', label: 'SADC/EAC Tier 2\nCSPF 6.1 all members', detail: 'SADC and EAC aligned Phase 2 tightening target. All member states expected to enforce CSPF ≥ 6.1. This is the most significant MEPS escalation in African history — +36% above Phase 1.', value: 'CSPF 6.1 (regional)', shape: 'diamond' }
+          ];
+          const CONFIG = {
+            yearStart: 2010, yearEnd: 2035,
+            rows: ['SADC', 'EAC', 'ECOWAS', 'National'],
+            rowHeight: 90, marginTop: 40, marginBottom: 50, marginLeft: 90, marginRight: 30,
+            dotRadius: 7, diamondSize: 9,
+            colorCompleted: '#62D32F', colorUpcoming: '#FF5721', colorToday: '#003E51',
+            colorGrid: '#e5e7eb', colorRowBg: ['#f9fafb', '#ffffff']
+          };
+          let _rendered = false;
+          function render() {
+            const container = document.getElementById('d5-timeline-container');
+            if (!container) { console.warn('D5: #d5-timeline-container not found.'); return; }
+            if (_rendered) return;
+            _rendered = true;
+            container.innerHTML = '';
+            const containerWidth = container.clientWidth || 800;
+            const width = containerWidth;
+            const height = CONFIG.marginTop + CONFIG.rows.length * CONFIG.rowHeight + CONFIG.marginBottom;
+            const svg = d3.select('#d5-timeline-container').append('svg').attr('id', 'd5-svg')
+              .attr('width', '100%').attr('height', height).attr('viewBox', `0 0 ${width} ${height}`)
+              .attr('preserveAspectRatio', 'xMinYMid meet').style('font-family', 'inherit');
+            const innerWidth = width - CONFIG.marginLeft - CONFIG.marginRight;
+            const innerHeight = CONFIG.rows.length * CONFIG.rowHeight;
+            const xScale = d3.scaleTime().domain([new Date(CONFIG.yearStart, 0, 1), new Date(CONFIG.yearEnd, 11, 31)]).range([0, innerWidth]);
+            const yScale = d3.scaleBand().domain(CONFIG.rows).range([0, innerHeight]).padding(0);
+            const g = svg.append('g').attr('transform', `translate(${CONFIG.marginLeft},${CONFIG.marginTop})`);
+            CONFIG.rows.forEach((row, i) => {
+              g.append('rect').attr('x', 0).attr('y', yScale(row)).attr('width', innerWidth).attr('height', yScale.bandwidth()).attr('fill', CONFIG.colorRowBg[i % 2]).attr('rx', 0);
+            });
+            const yearTicks = d3.timeYear.range(new Date(CONFIG.yearStart, 0, 1), new Date(CONFIG.yearEnd + 1, 0, 1));
+            g.selectAll('.d5-gridline').data(yearTicks).enter().append('line').attr('class', 'd5-gridline')
+              .attr('x1', d => xScale(d)).attr('x2', d => xScale(d)).attr('y1', 0).attr('y2', innerHeight)
+              .attr('stroke', CONFIG.colorGrid).attr('stroke-width', 1);
+            CONFIG.rows.forEach((row, i) => {
+              if (i === 0) return;
+              g.append('line').attr('x1', 0).attr('x2', innerWidth).attr('y1', yScale(row)).attr('y2', yScale(row)).attr('stroke', CONFIG.colorGrid).attr('stroke-width', 1.5);
+            });
+            g.append('line').attr('x1', 0).attr('x2', innerWidth).attr('y1', innerHeight).attr('y2', innerHeight).attr('stroke', CONFIG.colorGrid).attr('stroke-width', 1.5);
+            const yAxis = d3.axisLeft(yScale).tickSize(0);
+            g.append('g').call(yAxis).call(gEl => gEl.select('.domain').remove()).selectAll('text').attr('dx', '-8').attr('font-size', '13px').attr('font-weight', '600').attr('fill', '#003e51').attr('text-anchor', 'end');
+            const xAxis = d3.axisBottom(xScale).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(4);
+            g.append('g').attr('transform', `translate(0,${innerHeight})`).call(xAxis).call(gEl => gEl.select('.domain').attr('stroke', CONFIG.colorGrid)).selectAll('text').attr('font-size', '11px').attr('fill', '#6b7280');
+            const todayX = xScale(TODAY);
+            if (todayX >= 0 && todayX <= innerWidth) {
+              g.append('line').attr('id', 'd5-today-line').attr('x1', todayX).attr('x2', todayX).attr('y1', 0).attr('y2', innerHeight + 6).attr('stroke', CONFIG.colorToday).attr('stroke-width', 2).attr('stroke-dasharray', '5,4');
+              g.append('text').attr('x', todayX + 4).attr('y', -6).attr('font-size', '10px').attr('fill', CONFIG.colorToday).attr('font-weight', '600').text('TODAY');
+            }
+            let tooltip = d3.select('#d5-tooltip');
+            if (tooltip.empty()) { tooltip = d3.select('body').append('div').attr('id', 'd5-tooltip').attr('class', 'd5-tooltip').style('display', 'none'); }
+            function showTooltip(event, d) {
+              const dateStr = new Date(d.date).getFullYear();
+              const pastLabel = isPast(d.date) ? 'Completed' : 'Upcoming';
+              tooltip.style('display', 'block').html(`
+                <div class="d5-tt-header"><span class="d5-tt-label">${d.label.replace(/\n/g, ' ')}</span><span class="d5-tt-badge d5-tt-badge--${isPast(d.date)?'done':'upcoming'}">${pastLabel}</span></div>
+                <div class="d5-tt-row"><strong>Year:</strong> ${dateStr}</div>
+                <div class="d5-tt-row"><strong>Region:</strong> ${d.row}</div>
+                <div class="d5-tt-row"><strong>Value:</strong> ${d.value}</div>
+                <div class="d5-tt-detail">${d.detail}</div>
+              `);
+              positionTooltip(event);
+            }
+            function positionTooltip(event) {
+              const tt = tooltip.node();
+              const ttW = tt.offsetWidth || 280, ttH = tt.offsetHeight || 120;
+              const vw = window.innerWidth, vh = window.innerHeight;
+              let left = event.pageX + 12, top = event.pageY - 20;
+              if (left + ttW > vw - 16) left = event.pageX - ttW - 12;
+              if (top  + ttH > vh - 16) top  = event.pageY - ttH - 8;
+              tooltip.style('left', `${left}px`).style('top', `${top}px`);
+            }
+            function hideTooltip() { tooltip.style('display', 'none'); }
+            TIMELINE_EVENTS.forEach(ev => {
+              const rowBand = yScale(ev.row);
+              if (rowBand === undefined) return;
+              const cx = xScale(new Date(ev.date));
+              const cy = rowBand + yScale.bandwidth() / 2 + (ev.offsetY || 0);
+              const color = isPast(ev.date) ? CONFIG.colorCompleted : CONFIG.colorUpcoming;
+              const evGroup = g.append('g').attr('class', 'd5-event').attr('data-id', ev.id).style('cursor', 'pointer');
+              if (ev.shape === 'diamond') {
+                const s = CONFIG.diamondSize;
+                evGroup.append('rect').attr('x', cx - s).attr('y', cy - s).attr('width', s * 2).attr('height', s * 2).attr('transform', `rotate(45,${cx},${cy})`).attr('fill', color).attr('stroke', '#ffffff').attr('stroke-width', 1.5);
+              } else {
+                evGroup.append('circle').attr('cx', cx).attr('cy', cy).attr('r', CONFIG.dotRadius).attr('fill', color).attr('stroke', '#ffffff').attr('stroke-width', 1.5);
+              }
+              const labelLines = ev.label.split('\n');
+              const labelAbove = cy > yScale.bandwidth() * 0.65;
+              const labelY0 = labelAbove ? cy - CONFIG.dotRadius - 5 - (labelLines.length - 1) * 10 : cy + CONFIG.dotRadius + 12;
+              const textEl = evGroup.append('text').attr('x', cx).attr('y', labelY0).attr('text-anchor', 'middle').attr('font-size', '9.5px').attr('fill', '#374151');
+              labelLines.forEach((line, i) => { textEl.append('tspan').attr('x', cx).attr('dy', i === 0 ? 0 : '1.1em').text(line); });
+              evGroup.on('mouseenter', (event, _d) => showTooltip(event, ev)).on('mousemove', (event) => positionTooltip(event)).on('mouseleave', () => hideTooltip());
+            });
+            const legendData = [
+              { color: CONFIG.colorCompleted, label: 'Completed milestone' },
+              { color: CONFIG.colorUpcoming,  label: 'Upcoming / target' },
+              { color: CONFIG.colorToday,     label: 'Today', dashed: true }
+            ];
+            const legendG = svg.append('g').attr('transform', `translate(${CONFIG.marginLeft},${height - CONFIG.marginBottom + 22})`);
+            legendData.forEach((item, i) => {
+              const lx = i * 200;
+              if (item.dashed) {
+                legendG.append('line').attr('x1', lx).attr('x2', lx + 20).attr('y1', 6).attr('y2', 6).attr('stroke', item.color).attr('stroke-width', 2).attr('stroke-dasharray', '5,3');
+              } else {
+                legendG.append('circle').attr('cx', lx + 10).attr('cy', 6).attr('r', 6).attr('fill', item.color);
+              }
+              legendG.append('text').attr('x', lx + 26).attr('y', 10).attr('font-size', '11px').attr('fill', '#6b7280').text(item.label);
+            });
+            console.log('D5: Timeline rendered.');
+          }
+          let _resizeTimer;
+          window.addEventListener('resize', () => {
+            clearTimeout(_resizeTimer);
+            _resizeTimer = setTimeout(() => {
+              _rendered = false;
+              const container = document.getElementById('d5-timeline-container');
+              if (container) container.innerHTML = '';
+              render();
+            }, 200);
+          });
+          window.D5_render = render;
+          window.D5_rerender = function () {
+            _rendered = false;
+            const container = document.getElementById('d5-timeline-container');
+            if (container) container.innerHTML = '';
+            render();
+          };
+          console.log('D5: Timeline module loaded.');
+        })();
+
+        // ================================================================
+        // D6 — Regional Reference Comparison in Country Modal
+        // ================================================================
+        (function () {
+          'use strict';
+          const EXCEEDS_MARGIN = 0.05;
+          const EAC_DATA_ERROR_COUNTRIES = new Set(['Burundi', 'Rwanda', 'Uganda', 'South Sudan', 'Somalia']);
+          const NIGERIA_METRIC_DIVERGES = true;
+          const REFERENCE_DATA_FALLBACK = [
+            { region: 'SADC',   appliance: 'RAC',          standard: 'SADC HT 110:2023',                            metric: 'CSPF',     direction: 'higher_is_better', phase: 1, value: 4.50,  value_text: null,              effective_date: '2024-02-01' },
+            { region: 'SADC',   appliance: 'RAC',          standard: 'SADC HT 110:2023 (Phase 2)',                  metric: 'CSPF',     direction: 'higher_is_better', phase: 2, value: 6.10,  value_text: null,              effective_date: '2027-01-01' },
+            { region: 'SADC',   appliance: 'Refrigerator', standard: 'SADC HT 111:2023',                           metric: 'EEI',      direction: 'lower_is_better',  phase: 1, value: 120.0, value_text: null,              effective_date: '2024-02-01' },
+            { region: 'EAC',    appliance: 'RAC',          standard: 'EAC EAS 1213:2025',                           metric: 'CSPF',     direction: 'higher_is_better', phase: 1, value: 4.50,  value_text: null,              effective_date: '2025-07-01' },
+            { region: 'EAC',    appliance: 'Refrigerator', standard: 'EAC EAS 1212:2025',                          metric: 'EEI',      direction: 'lower_is_better',  phase: 1, value: 120.0, value_text: null,              effective_date: '2025-07-01' },
+            { region: 'ECOWAS', appliance: 'RAC',          standard: 'ECOWAS Energy Efficiency Directive — AC',     metric: 'CSPF',     direction: 'higher_is_better', phase: 1, value: 3.00,  value_text: null,              effective_date: null },
+            { region: 'ECOWAS', appliance: 'RAC',          standard: 'ECOWAS Directive Phase 2',                    metric: 'CSPF',     direction: 'higher_is_better', phase: 2, value: 3.50,  value_text: null,              effective_date: null },
+            { region: 'ECOWAS', appliance: 'Lighting',     standard: 'ECOWAS Lighting Directive — LED Efficacy',    metric: 'lm/W',     direction: 'higher_is_better', phase: 1, value: 70.0,  value_text: '70–80 lm/W',      effective_date: null },
+            { region: 'ECOWAS', appliance: 'Refrigerator', standard: 'ECOWAS Directive — Refrigerators',           metric: 'EEI',      direction: 'lower_is_better',  phase: 1, value: 140.0, value_text: null,              effective_date: null },
+            { region: 'ECOWAS', appliance: 'Motors',       standard: 'ECOWAS Energy Efficiency Programme — Motors', metric: 'IE_class', direction: 'higher_is_better', phase: 1, value: null,  value_text: 'IE2 (minimum)',   effective_date: null },
+            { region: 'AFREC',  appliance: 'RAC',          standard: 'AfEES — African Energy Efficiency Strategy',  metric: 'CSPF',     direction: 'higher_is_better', phase: 1, value: null,  value_text: 'No binding threshold', effective_date: null },
+            { region: 'AFREC',  appliance: 'Refrigerator', standard: 'AfEES',                                       metric: 'EEI',      direction: 'lower_is_better',  phase: 1, value: null,  value_text: 'No binding threshold', effective_date: null },
+            { region: 'AFREC',  appliance: 'Lighting',     standard: 'AfEES',                                       metric: 'lm/W',     direction: 'higher_is_better', phase: 1, value: null,  value_text: 'No binding threshold', effective_date: null },
+            { region: 'AFREC',  appliance: 'Motors',       standard: 'AfEES',                                       metric: 'IE_class', direction: 'higher_is_better', phase: 1, value: null,  value_text: 'No binding threshold', effective_date: null }
+          ];
+          function getCountryRegion(countryName) {
+            const regions = window.REGIONS || {
+              SADC: ['Angola','Botswana','Comoros','Democratic Republic of the Congo','Eswatini','Lesotho','Madagascar','Malawi','Mauritius','Mozambique','Namibia','Seychelles','South Africa','Tanzania','Zambia','Zimbabwe'],
+              ECOWAS: ['Benin','Burkina Faso','Cape Verde','Cote d\'Ivoire','Gambia','Ghana','Guinea','Guinea-Bissau','Liberia','Mali','Niger','Nigeria','Senegal','Sierra Leone','Togo'],
+              EAC: ['Burundi','Kenya','Rwanda','South Sudan','Tanzania','Uganda','Democratic Republic of the Congo','Somalia']
+            };
+            if (regions.SADC   && regions.SADC.includes(countryName))   return 'SADC';
+            if (regions.EAC    && regions.EAC.includes(countryName))    return 'EAC';
+            if (regions.ECOWAS && regions.ECOWAS.includes(countryName)) return 'ECOWAS';
+            return 'AFREC';
+          }
+          function computeStatus(countryValue, refRow, countryMetric) {
+            if (countryMetric && refRow.metric && countryMetric !== refRow.metric) return { badge: 'different_metric' };
+            if (refRow.value === null) return { badge: 'not_applicable' };
+            if (countryValue === null || countryValue === undefined || countryValue === '') return { badge: 'pending' };
+            const cv = parseFloat(countryValue), rv = parseFloat(refRow.value);
+            if (isNaN(cv) || isNaN(rv)) return { badge: 'pending' };
+            if (refRow.direction === 'higher_is_better') {
+              if (cv > rv * (1 + EXCEEDS_MARGIN)) return { badge: 'exceeds' };
+              if (cv >= rv) return { badge: 'meets' };
+              return { badge: 'below' };
+            } else {
+              if (cv < rv * (1 - EXCEEDS_MARGIN)) return { badge: 'exceeds' };
+              if (cv <= rv) return { badge: 'meets' };
+              return { badge: 'below' };
+            }
+          }
+          const BADGE_DEFS = {
+            exceeds:          { icon: '✅', label: 'Exceeds norm',    bg: '#D1FAE5', color: '#065F46', border: '#6EE7B7', tooltip: 'This country\'s MEPS is more stringent than the regional standard by more than 5%.' },
+            meets:            { icon: '✓',  label: 'Meets norm',     bg: '#ECFDF5', color: '#047857', border: '#A7F3D0', tooltip: 'This country\'s MEPS meets the regional standard minimum within a 5% tolerance.' },
+            below:            { icon: '⚠',  label: 'Below norm',     bg: '#FFFBEB', color: '#92400E', border: '#FCD34D', tooltip: 'This country\'s MEPS falls below the regional minimum. Regulatory upgrade needed.' },
+            pending:          { icon: '⏳', label: 'Pending data',   bg: '#F9FAFB', color: '#6B7280', border: '#D1D5DB', tooltip: 'Country MEPS value not available. Comparison cannot be calculated.' },
+            not_applicable:   { icon: '—',  label: 'Not applicable', bg: '#F3F4F6', color: '#9CA3AF', border: 'none',    tooltip: 'No regional standard exists for this appliance in this region.' },
+            different_metric: { icon: '≠',  label: 'Metric differs', bg: '#EFF6FF', color: '#1D4ED8', border: '#93C5FD', tooltip: 'Country uses a different metric (e.g., NSEER vs CSPF). Direct comparison not possible.' }
+          };
+          function buildBadgeHTML(badgeKey) {
+            const def = BADGE_DEFS[badgeKey] || BADGE_DEFS.not_applicable;
+            const borderCSS = def.border !== 'none' ? `border:1px solid ${def.border};` : '';
+            return `<span class="d6-badge" style="background:${def.bg};color:${def.color};${borderCSS}" title="${def.tooltip}">${def.icon} ${def.label}</span>`;
+          }
+          const APPLIANCE_MAP = {
+            'RAC':          { displayLabel: 'Room Air Conditioners (RAC)', countryValueKey: 'rac_cspf_min',           countryMetric: 'CSPF'     },
+            'Refrigerator': { displayLabel: 'Domestic Refrigerators',      countryValueKey: 'refrigeration_eei_max',  countryMetric: 'EEI'      },
+            'Lighting':     { displayLabel: 'Lighting (LED)',               countryValueKey: 'lighting_efficacy_min',  countryMetric: 'lm/W'     },
+            'Motors':       { displayLabel: 'Electric Motors',              countryValueKey: 'motors_level',           countryMetric: 'IE_class' }
+          };
+          async function fetchLiveReferenceData(region) {
+            const SUPABASE_URL = window.SUPABASE_URL || 'https://lwketrcirgxeizevfdfs.supabase.co';
+            const SUPABASE_KEY = window.SUPABASE_ANON_KEY;
+            if (!SUPABASE_KEY || SUPABASE_KEY.includes('PASTE')) return null;
+            try {
+              const res = await fetch(`${SUPABASE_URL}/rest/v1/meps_regional_reference?region=eq.${encodeURIComponent(region)}&phase=eq.1&select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const rows = await res.json();
+              const res2 = await fetch(`${SUPABASE_URL}/rest/v1/meps_regional_reference?region=eq.${encodeURIComponent(region)}&phase=eq.2&select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+              const rows2 = res2.ok ? await res2.json() : [];
+              return { phase1: rows, phase2: rows2 };
+            } catch (err) { console.warn('D6: Supabase reference fetch failed, using fallback:', err.message); return null; }
+          }
+          async function renderComparison(countryName, countryData, containerEl) {
+            if (!containerEl) return;
+            containerEl.innerHTML = `<div class="d6-loading">Loading regional benchmark data…</div>`;
+            const region = getCountryRegion(countryName);
+            let phase1Rows, phase2Rows;
+            const liveData = await fetchLiveReferenceData(region);
+            if (liveData) { phase1Rows = liveData.phase1; phase2Rows = liveData.phase2; }
+            else {
+              phase1Rows = REFERENCE_DATA_FALLBACK.filter(r => r.region === region && r.phase === 1);
+              phase2Rows = REFERENCE_DATA_FALLBACK.filter(r => r.region === region && r.phase === 2);
+            }
+            const standardName = phase1Rows.length > 0 ? phase1Rows[0].standard || '' : '';
+            const isNigeria = (countryName === 'Nigeria');
+            const needsEACBanner = EAC_DATA_ERROR_COUNTRIES.has(countryName);
+            const applianceRows = ['RAC', 'Refrigerator', 'Lighting', 'Motors'].map(appKey => {
+              const appDef = APPLIANCE_MAP[appKey];
+              const refRow = phase1Rows.find(r => r.appliance === appKey) || null;
+              const ph2Row = phase2Rows.find(r => r.appliance === appKey) || null;
+              const countryRawValue = countryData[appDef.countryValueKey];
+              const countryDisplayValue = countryRawValue !== null && countryRawValue !== undefined ? `${appDef.countryMetric} ${countryRawValue}` : '—';
+              let refDisplay = '—';
+              if (refRow) {
+                refDisplay = refRow.value_text ? refRow.value_text : (refRow.value !== null ? `${refRow.metric} ${refRow.value}` : 'No binding threshold');
+                if (refRow.standard) refDisplay += `<br><small class="d6-ref-standard">${refRow.standard}</small>`;
+              }
+              let badgeHTML;
+              if (isNigeria && appKey === 'RAC' && NIGERIA_METRIC_DIVERGES) { badgeHTML = buildBadgeHTML('different_metric'); }
+              else if (!refRow) { badgeHTML = buildBadgeHTML('not_applicable'); }
+              else { const { badge } = computeStatus(countryRawValue, refRow, appDef.countryMetric); badgeHTML = buildBadgeHTML(badge); }
+              let ph2HTML = '';
+              if (ph2Row && ph2Row.value !== null) {
+                const ph2Year = ph2Row.effective_date ? new Date(ph2Row.effective_date).getFullYear() : 'upcoming';
+                ph2HTML = `<tr class="d6-phase2-row"><td colspan="4" class="d6-phase2-cell"><span class="d6-phase2-label">Phase 2 target (${ph2Year}):</span>${ph2Row.metric} ${ph2Row.value} — This country will need to upgrade from current ${appDef.countryMetric} ${countryRawValue || '?'} to meet the upcoming Phase 2 norm.</td></tr>`;
+              }
+              return { appKey, displayLabel: appDef.displayLabel, countryDisplayValue, refDisplay, badgeHTML, ph2HTML };
+            });
+            const nigeriaNote = isNigeria ? `<div class="benchmark-country-note benchmark-note--warning"><span class="benchmark-note__icon">ℹ</span><div class="benchmark-note__content"><strong>Nigeria — National standard diverges from ECOWAS directive</strong><p>Nigeria uses <abbr title="National Seasonal Energy Efficiency Rating">NSEER</abbr> with national climate bins (hot-humid ≥ 3.3, hot-dry ≥ 2.8, mixed ≥ 3.0), not ISO 16358-1 CSPF. The two metrics use different test conditions and are not directly comparable. Nigeria's NSEER was independently developed and is <strong>not aligned</strong> with the ECOWAS AC directive (CSPF ≥ 3.0). Enforcement level: L3 (active).</p></div></div>` : '';
+            const eacBanner = needsEACBanner ? `<div class="benchmark-data-alert">⚠ Data correction pending: The CSPF value stored for this country may reflect a data entry error. EAC EAS 1213:2025 Phase 1 specifies CSPF ≥ 4.5. This comparison will be updated when the source data is corrected.</div>` : '';
+            const tableRows = applianceRows.map(row => `<tr class="d6-table-row"><td class="d6-col-appliance">${row.displayLabel}</td><td class="d6-col-country">${row.countryDisplayValue}</td><td class="d6-col-norm">${row.refDisplay}</td><td class="d6-col-status">${row.badgeHTML}</td></tr>${row.ph2HTML}`).join('');
+            const panelTooltip = 'This table compares the country\'s current MEPS values against the minimum requirements set by its regional standard. Status shows whether the country meets, exceeds, or falls below the regional norm.';
+            containerEl.innerHTML = `
+              <div class="d6-benchmark-panel">
+                ${eacBanner}
+                <div class="d6-panel-header">
+                  <div class="d6-panel-title">Regional Benchmark Comparison <button class="d6-info-btn" title="${panelTooltip}" aria-label="About this comparison">?</button></div>
+                  <div class="d6-panel-meta">Region: <strong>${region}</strong>${standardName ? ` &nbsp;|&nbsp; Standard: <strong>${standardName}</strong>` : ''}</div>
+                </div>
+                ${nigeriaNote}
+                <div class="d6-table-wrapper">
+                  <table class="d6-table" role="table" aria-label="Regional benchmark comparison for ${countryName}">
+                    <thead><tr><th class="d6-th">Appliance</th><th class="d6-th">Country MEPS</th><th class="d6-th">Regional Norm</th><th class="d6-th">Status</th></tr></thead>
+                    <tbody>${tableRows}</tbody>
+                  </table>
+                </div>
+              </div>
+            `;
+          }
+          window.D6_renderComparison = renderComparison;
+          console.log('D6: Regional comparison module loaded.');
+        })();
     </script>
 </body>
 </html>
