@@ -1327,7 +1327,11 @@
                         avg_ac_price_usd: row.avg_ac_price_usd,
                         avg_refrigerator_price_usd: row.avg_refrigerator_price_usd,
                         savings_methodology: row.savings_methodology,
-                        data_sources: row.data_sources
+                        data_sources: row.data_sources,
+                        rac_metric_type: row.rac_metric_type || null,
+                        no_data_flag: row.no_data_flag || false,
+                        status_notes: row.status_notes || null,
+                        last_verified: row.last_verified || null
                     };
                 });
 
@@ -1559,7 +1563,11 @@
             let metricsHtml = '';
 
             if (data.rac_cspf_min) {
-                metricsHtml += `<div>AC CSPF: ${data.rac_cspf_min}${data.rac_cspf_target ? ' → ' + data.rac_cspf_target : ''}</div>`;
+                const isEER = data.rac_metric_type === 'EER_converted';
+                const isNSEER = data.rac_metric_type === 'National_CSPF';
+                const suffix = isEER ? '<span title="EER-converted value — not directly comparable to ISO CSPF. See methodology." style="cursor:help;color:#ff5721;"> *</span>'
+                             : isNSEER ? '<span title="National metric (NSEER) — climate-bin based, not ISO 16358-1 CSPF. See methodology." style="cursor:help;color:#ff5721;"> †</span>' : '';
+                metricsHtml += `<div>AC CSPF: ${data.rac_cspf_min}${data.rac_cspf_target ? ' → ' + data.rac_cspf_target : ''}${suffix}</div>`;
             }
             if (data.refrigeration_eei_max) {
                 metricsHtml += `<div>Refrigerator EEI: ≤${data.refrigeration_eei_max}</div>`;
@@ -1572,6 +1580,9 @@
             }
             if (data.electricity_tariff) {
                 metricsHtml += `<div>Electricity: $${data.electricity_tariff}/kWh</div>`;
+            }
+            if (data.no_data_flag) {
+                metricsHtml += `<div style="color:#b45309;margin-top:4px;font-size:0.75rem;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i>Data partially unverified — see status notes</div>`;
             }
 
             metricsEl.innerHTML = metricsHtml || '<div class="text-gray-400">No detailed metrics available</div>';
@@ -1644,7 +1655,26 @@
                 const badge = getStatusBadge(appStatus);
 
                 let metricHtml = '';
-                if (app.minKey && data[app.minKey]) {
+                if (app.key === 'rac' && app.minKey && data[app.minKey]) {
+                    const isEER   = data.rac_metric_type === 'EER_converted';
+                    const isNSEER = data.rac_metric_type === 'National_CSPF';
+                    const metricLabel = isNSEER ? 'NSEER' : 'CSPF';
+                    const asterisk = isEER
+                        ? `<span title="EER-converted — not directly comparable to ISO CSPF" style="cursor:help;color:#ff5721;font-weight:bold;"> *</span>`
+                        : isNSEER
+                        ? `<span title="National climate-bin metric (NSEER) — not ISO 16358-1 CSPF" style="cursor:help;color:#ff5721;font-weight:bold;"> †</span>`
+                        : '';
+                    metricHtml = `<div class="text-sm text-gray-600 mt-2">Min: ${data[app.minKey]} ${metricLabel}${asterisk}</div>`;
+                    if (app.targetKey && data[app.targetKey]) {
+                        metricHtml += `<div class="text-sm text-gray-600">Target: ${data[app.targetKey]} ${metricLabel}</div>`;
+                    }
+                    if (isEER || isNSEER) {
+                        const note = isEER
+                            ? '* Converted from EER using CSPF ≈ EER × 0.9. Not directly comparable to ISO 16358-1 CSPF.'
+                            : '† Nigeria NSEER uses national climate bins (hot-humid/hot-dry/mixed), not ISO 16358-1 bins.';
+                        metricHtml += `<div class="text-xs mt-1" style="color:#b45309;">${note}</div>`;
+                    }
+                } else if (app.minKey && data[app.minKey]) {
                     metricHtml = `<div class="text-sm text-gray-600 mt-2">Min: ${data[app.minKey]} ${app.metric}</div>`;
                     if (app.targetKey && data[app.targetKey]) {
                         metricHtml += `<div class="text-sm text-gray-600">Target: ${data[app.targetKey]} ${app.metric}</div>`;
@@ -1691,6 +1721,28 @@
             }
 
             html += `</div></div>`;
+
+            // Data Quality Notes (no_data_flag + status_notes)
+            if (data.no_data_flag || data.status_notes) {
+                html += `<div class="mb-6">`;
+                if (data.no_data_flag) {
+                    html += `
+                        <div class="flex items-start gap-2 p-3 rounded-lg mb-3" style="background:rgba(180,83,9,0.08);border-left:4px solid #b45309;">
+                            <i class="fa-solid fa-triangle-exclamation mt-0.5" style="color:#b45309;flex-shrink:0;"></i>
+                            <span class="text-sm" style="color:#92400e;"><strong>Data quality flag:</strong> One or more data points for this country are partially unverified or pending source confirmation. Use with caution.</span>
+                        </div>`;
+                }
+                if (data.status_notes) {
+                    html += `
+                        <details class="rounded-lg border" style="border-color:var(--heat-line);">
+                            <summary class="p-3 cursor-pointer text-sm font-medium select-none" style="color:var(--heat-blue-800);">
+                                <i class="fa-solid fa-circle-info mr-2" style="color:var(--heat-blue-600);"></i>Status nuance &amp; data source notes
+                            </summary>
+                            <div class="px-4 pb-4 pt-2 text-sm text-gray-600" style="line-height:1.6;">${data.status_notes.replace(/\n/g,'<br>')}</div>
+                        </details>`;
+                }
+                html += `</div>`;
+            }
 
             // Energy Savings Potential Section
             if (data.total_savings_potential_gwh || data.total_co2_reduction_kt) {
