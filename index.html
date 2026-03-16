@@ -702,6 +702,19 @@
 
             <!-- Methodology Section (hidden by default) -->
             <div id="section-methodology" class="hidden">
+
+                <!-- CSPF Metric Comparability Notice -->
+                <div class="p-4 rounded-lg mb-6 border" style="background:rgba(0,94,168,0.05);border-color:#93c5fd;">
+                    <h4 class="font-semibold text-sm mb-2" style="color:var(--heat-blue-800);"><i class="fa-solid fa-circle-info mr-2"></i>CSPF Metric Comparability — Important Note</h4>
+                    <p class="text-sm text-gray-700 mb-2">Not all CSPF values in this database are directly comparable. Three metric types are used:</p>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li><strong>ISO CSPF</strong> (22 countries — all SADC &amp; EAC): measured per ISO 16358-1:2013. Directly comparable across countries.</li>
+                        <li><strong>EER-converted *</strong> (Algeria, Egypt, Tunisia, Ghana, Benin): native standard uses EER; stored CSPF value is an approximation using CSPF ≈ EER × 1.062 (LBNL ASEAN 2021, fixed-speed units). This conversion has not been validated against African market conditions. Marked with * throughout the dashboard.</li>
+                        <li><strong>NSEER †</strong> (Nigeria): National Seasonal Energy Efficiency Rating uses Nigerian climate bins (tropical 35–46 °C range), not ISO 16358-1 bins. Values are approximately but not directly equivalent to ISO CSPF. Marked with † throughout the dashboard.</li>
+                        <li><strong>Directive target</strong> (ECOWAS directive countries, 12): regional aspirational targets (CSPF 3.0/3.5), not enforced national minimums backed by testing infrastructure.</li>
+                    </ul>
+                </div>
+
                 <div class="bg-white rounded-lg shadow-sm border p-6 mb-6" style="border-color: var(--heat-line);">
                     <h3 class="font-semibold heat-heading text-lg mb-4"><i class="fa-solid fa-calculator mr-2"></i>Calculation Methodology</h3>
 
