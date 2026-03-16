@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AU MEPS Dashboard | HEAT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --heat-green: #62d32f;
+            --heat-green-600: #00953c;
+            --heat-blue-600: #005ca8;
+            --heat-blue-800: #003e51;
+            --heat-text: #114a7d;
+            --heat-bg: #ffffff;
+            --heat-bg-alt: #f4f6f8;
+            --heat-line: #d9e1e8;
+            --heat-orange: #ff5721;
+            --heat-red: #c21632;
+        }
+        body { font-family: 'Open Sans', Calibri, Arial, system-ui, sans-serif; background: var(--heat-bg-alt); color: var(--heat-text); }
+        .heat-heading { color: var(--heat-blue-800); }
+        .heat-sidebar { background: var(--heat-blue-800); }
+        .heat-accent { background: var(--heat-green); }
+    </style>
+</head>
+<body>
+    <!-- Password Protection Modal -->
+    <div id="password-modal" class="fixed inset-0 flex items-center justify-center z-50" style="background: var(--heat-blue-800);">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-2 h-10 rounded" style="background: var(--heat-green);"></div>
+                <div>
+                    <h2 class="text-xl font-bold" style="color: var(--heat-blue-800);">AU MEPS Dashboard</h2>
+                    <p class="text-sm text-gray-500">Protected Access</p>
+                </div>
+            </div>
+            <form onsubmit="checkPassword(event)">
+                <label class="block text-sm font-medium mb-2" style="color: var(--heat-text);">Enter Access Code</label>
+                <input type="password" id="password-input" class="w-full px-4 py-3 border rounded-lg mb-4 focus:outline-none focus:ring-2" style="border-color: var(--heat-line); --tw-ring-color: var(--heat-blue-600);" placeholder="Access code" autofocus>
+                <p id="password-error" class="text-sm mb-4 hidden" style="color: var(--heat-red);">Incorrect access code. Please try again.</p>
+                <button type="submit" class="w-full py-3 rounded-lg font-semibold text-white transition-colors" style="background: var(--heat-green-600);" onmouseover="this.style.background='var(--heat-green)'" onmouseout="this.style.background='var(--heat-green-600)'">
+                    <i class="fa-solid fa-lock-open mr-2"></i>Access Dashboard
+                </button>
+            </form>
+            <p class="text-xs text-center mt-4 text-gray-400">HEAT GmbH - AU MEPS Implementation Project</p>
+        </div>
+    </div>
+
+    <div id="main-content" class="flex h-screen hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 heat-sidebar text-white flex flex-col">
+            <!-- Header with green accent -->
+            <div class="p-4 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-8 rounded" style="background: var(--heat-green);"></div>
+                    <div>
+                        <h1 class="text-lg font-bold">AU MEPS Gateway</h1>
+                        <p class="text-xs text-white/60">Implementation Dashboard</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="#" onclick="setView('overview')" id="nav-overview" class="nav-link active block px-3 py-2 rounded text-sm font-medium" style="background: rgba(98,211,47,0.2);">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                </a>
+                <div class="text-xs text-white/40 uppercase mt-6 mb-2 px-3">Appliances</div>
+                <a href="#" onclick="setView('rac')" id="nav-rac" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-snowflake w-5"></i> Cooling (RAC)
+                </a>
+                <a href="#" onclick="setView('refrigeration')" id="nav-refrigeration" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-box-archive w-5"></i> Refrigeration
+                </a>
+                <a href="#" onclick="setView('lighting')" id="nav-lighting" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-lightbulb w-5"></i> Lighting
+                </a>
+                <a href="#" onclick="setView('motors')" id="nav-motors" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-gear w-5"></i> Electric Motors
+                </a>
+                <div class="text-xs text-white/40 uppercase mt-6 mb-2 px-3">Resources</div>
+                <a href="#" onclick="setView('methodology')" id="nav-methodology" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-book w-5"></i> Methodology
+                </a>
+                <a href="#" onclick="setView('sources')" id="nav-sources" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-database w-5"></i> Data Sources
+                </a>
+                <a href="#" onclick="setView('contacts')" id="nav-contacts" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
+                    <i class="fa-solid fa-address-book w-5"></i> Regional Contacts
+                </a>
+            </nav>
+            <!-- Footer -->
+            <div class="p-4 border-t border-white/10 text-xs text-white/40">
+                <p>HEAT GmbH &copy; 2024</p>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="flex-1 p-8 overflow-auto">
+            <h2 id="title" class="text-2xl font-bold heat-heading mb-6">Regional Overview</h2>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg shadow-sm border" style="border-color: var(--heat-line);">
+                    <div class="text-sm" style="color: var(--heat-text);">Mandatory MEPS</div>
+                    <div id="stat-mandatory" class="text-3xl font-bold" style="color: var(--heat-green-600);">0</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border" style="border-color: var(--heat-line);">
+                    <div class="text-sm" style="color: var(--heat-text);">Regional Framework</div>
+                    <div id="stat-regional" class="text-3xl font-bold" style="color: var(--heat-blue-600);">0</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border" style="border-color: var(--heat-line);">
+                    <div class="text-sm" style="color: var(--heat-text);">In Development</div>
+                    <div id="stat-dev" class="text-3xl font-bold" style="color: var(--heat-orange);">0</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border" style="border-color: var(--heat-line);">
+                    <div class="text-sm" style="color: var(--heat-text);">No MEPS</div>
+                    <div id="stat-none" class="text-3xl font-bold" style="color: #94a3b8;">0</div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="bg-white rounded-lg shadow-sm border p-4" style="border-color: var(--heat-line);">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold heat-heading"><i class="fa-solid fa-earth-africa mr-2"></i>Implementation Map</h3>
+                    <div class="flex gap-4 text-xs" style="color: var(--heat-text);">
+                        <span><span class="inline-block w-3 h-3 rounded-full mr-1" style="background: var(--heat-green-600);"></span>Mandatory</span>
+                        <span><span class="inline-block w-3 h-3 rounded-full mr-1" style="background: var(--heat-blue-600);"></span>Regional</span>
+                        <span><span class="inline-block w-3 h-3 rounded-full mr-1" style="background: var(--heat-orange);"></span>Development</span>
+                        <span><span class="inline-block w-3 h-3 rounded-full mr-1" style="background: #cbd5e1;"></span>None</span>
+                    </div>
+                </div>
+                <div class="flex gap-6 text-xs mb-3 border-t pt-3" style="border-color: var(--heat-line); color: var(--heat-text);">
+                    <span class="font-semibold">Regional Blocs:</span>
+                    <span><svg width="24" height="12" class="inline-block mr-1 align-middle"><line x1="0" y1="6" x2="24" y2="6" stroke="#005ca8" stroke-width="4" stroke-dasharray="6,3"/></svg>SADC</span>
+                    <span><svg width="24" height="12" class="inline-block mr-1 align-middle"><line x1="0" y1="6" x2="24" y2="6" stroke="#62d32f" stroke-width="4" stroke-dasharray="6,3"/></svg>ECOWAS</span>
+                    <span><svg width="24" height="12" class="inline-block mr-1 align-middle"><line x1="0" y1="6" x2="24" y2="6" stroke="#ff5721" stroke-width="4" stroke-dasharray="6,3"/></svg>EAC</span>
+                </div>
+                <div id="map" style="width: 100%; height: 500px; background: var(--heat-bg-alt); border-radius: 6px;"></div>
+            </div>
+
+            <!-- Tooltip -->
+            <div id="tooltip" style="position: fixed; background: var(--heat-blue-800); color: white; padding: 10px 14px; border-radius: 6px; font-size: 12px; pointer-events: none; opacity: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
+
+            <!-- Country Detail Panel -->
+            <div id="country-panel" class="hidden fixed right-8 top-24 w-80 bg-white rounded-lg shadow-xl border z-50" style="border-color: var(--heat-line);">
+                <div class="p-4 border-b flex justify-between items-center" style="background: var(--heat-blue-800); border-radius: 8px 8px 0 0;">
+                    <h3 id="panel-country-name" class="font-bold text-white text-lg"></h3>
+                    <button onclick="closePanel()" class="text-white/60 hover:text-white text-xl">&times;</button>
+                </div>
+                <div class="p-4 space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Region</span>
+                        <span id="panel-region" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">MEPS Status</span>
+                        <span id="panel-status" class="font-medium"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Label Status</span>
+                        <span id="panel-label" class="font-medium"></span>
+                    </div>
+                    <hr style="border-color: var(--heat-line);">
+                    <div class="text-xs font-semibold uppercase text-gray-400 mb-2">MEPS by Appliance</div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-sm p-2 rounded" style="background: var(--heat-bg-alt);">
+                            <span><i class="fa-solid fa-snowflake mr-2" style="color: var(--heat-blue-600);"></i>Air Conditioners</span>
+                            <span id="panel-rac" class="font-medium text-xs px-2 py-1 rounded"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm p-2 rounded" style="background: var(--heat-bg-alt);">
+                            <span><i class="fa-solid fa-box-archive mr-2" style="color: var(--heat-blue-600);"></i>Refrigerators</span>
+                            <span id="panel-refrigeration" class="font-medium text-xs px-2 py-1 rounded"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm p-2 rounded" style="background: var(--heat-bg-alt);">
+                            <span><i class="fa-solid fa-lightbulb mr-2" style="color: var(--heat-orange);"></i>Lighting</span>
+                            <span id="panel-lighting" class="font-medium text-xs px-2 py-1 rounded"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm p-2 rounded" style="background: var(--heat-bg-alt);">
+                            <span><i class="fa-solid fa-gear mr-2" style="color: var(--heat-green-600);"></i>Electric Motors</span>
+                            <span id="panel-motors" class="font-medium text-xs px-2 py-1 rounded"></span>
+                        </div>
+                    </div>
+                    <hr style="border-color: var(--heat-line);">
+                    <div id="panel-metrics" class="text-xs text-gray-500 space-y-1">
+                        <!-- Metrics like CSPF, EEI will be shown here if available -->
+                    </div>
+                    <button onclick="openCountryDetail()" class="w-full mt-3 py-2 rounded text-white font-medium text-sm" style="background: var(--heat-blue-600);">
+                        <i class="fa-solid fa-arrow-right mr-2"></i>View Full Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Full Country Detail Modal -->
+            <div id="country-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,62,81,0.8);">
+                <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-auto m-4">
+                    <div class="sticky top-0 p-4 border-b flex justify-between items-center" style="background: var(--heat-blue-800);">
+                        <h2 id="modal-country-name" class="font-bold text-white text-xl"></h2>
+                        <button onclick="closeCountryModal()" class="text-white/60 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <div class="p-6" id="modal-content">
+                        <!-- Content will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Methodology Section (hidden by default) -->
+            <div id="section-methodology" class="hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-6 mb-6" style="border-color: var(--heat-line);">
+                    <h3 class="font-semibold heat-heading text-lg mb-4"><i class="fa-solid fa-calculator mr-2"></i>Calculation Methodology</h3>
+
+                    <div class="space-y-6">
+                        <!-- Energy Savings -->
+                        <div class="border-l-4 pl-4" style="border-color: var(--heat-green);">
+                            <h4 class="font-semibold mb-2" style="color: var(--heat-blue-800);">Energy Savings Calculation</h4>
+                            <p class="text-sm mb-2">Annual energy savings are calculated based on the difference between baseline and efficient appliance energy consumption:</p>
+                            <div class="bg-gray-50 p-3 rounded font-mono text-sm">
+                                Energy Savings (kWh/year) = (Baseline Power - Efficient Power) × Daily Operating Hours × 365
+                            </div>
+                            <p class="text-xs mt-2 text-gray-600">For air conditioners: Power = Cooling Capacity (kW) ÷ CSPF</p>
+                        </div>
+
+                        <!-- Emissions Reduction -->
+                        <div class="border-l-4 pl-4" style="border-color: var(--heat-blue-600);">
+                            <h4 class="font-semibold mb-2" style="color: var(--heat-blue-800);">Emissions Reduction</h4>
+                            <p class="text-sm mb-2">CO₂ emissions reduction is calculated using country-specific grid emission factors:</p>
+                            <div class="bg-gray-50 p-3 rounded font-mono text-sm">
+                                CO₂ Reduction (tCO₂/year) = Energy Savings (kWh) × Grid Emission Factor (kgCO₂/kWh) ÷ 1000
+                            </div>
+                            <p class="text-xs mt-2 text-gray-600">Default GEF: 0.5 kgCO₂/kWh (Sub-Saharan Africa average). Country-specific factors available in database.</p>
+                        </div>
+
+                        <!-- Cost Savings -->
+                        <div class="border-l-4 pl-4" style="border-color: var(--heat-orange);">
+                            <h4 class="font-semibold mb-2" style="color: var(--heat-blue-800);">Cost Savings</h4>
+                            <p class="text-sm mb-2">Financial savings based on local electricity tariffs:</p>
+                            <div class="bg-gray-50 p-3 rounded font-mono text-sm">
+                                Annual Savings (USD) = Energy Savings (kWh) × Electricity Tariff (USD/kWh)
+                            </div>
+                            <p class="text-xs mt-2 text-gray-600">Default tariff: $0.15/kWh. Country-specific tariffs stored in database.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
+                    <h3 class="font-semibold heat-heading text-lg mb-4"><i class="fa-solid fa-chart-line mr-2"></i>Performance Metric Standards</h3>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- AC/CSPF -->
+                        <div>
+                            <h4 class="font-semibold mb-2" style="color: var(--heat-blue-800);">Air Conditioners - CSPF</h4>
+                            <p class="text-sm mb-2">Cooling Seasonal Performance Factor measures average efficiency across seasonal conditions.</p>
+                            <table class="w-full text-sm">
+                                <tr class="border-b"><td class="py-1">Baseline (Fixed Speed)</td><td class="text-right">CSPF 3.0</td></tr>
+                                <tr class="border-b"><td class="py-1">U4E Minimum (Level 3)</td><td class="text-right">CSPF 3.5</td></tr>
+                                <tr class="border-b"><td class="py-1">Advanced (Inverter)</td><td class="text-right">CSPF ≥ 4.5</td></tr>
+                                <tr><td class="py-1">Best Practice</td><td class="text-right">CSPF ≥ 5.5</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Refrigerators/EEI -->
+                        <div>
+                            <h4 class="font-semibold mb-2" style="color: var(--heat-blue-800);">Refrigerators - EEI</h4>
+                            <p class="text-sm mb-2">Energy Efficiency Index compares consumption to reference model (lower is better).</p>
+                            <table class="w-full text-sm">
+                                <tr class="border-b"><td class="py-1">Inefficient</td><td class="text-right">EEI > 150</td></tr>
+                                <tr class="border-b"><td class="py-1">ECOWAS Regional</td><td class="text-right">EEI ≤ 140</td></tr>
+                                <tr class="border-b"><td class="py-1">SADC Harmonized</td><td class="text-right">EEI ≤ 120</td></tr>
+                                <tr><td class="py-1">Global Best Practice</td><td class="text-right">EEI ≤ 100</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Motors/IE -->
+                        <div>
+                            <h4 class="font-semibold mb-2" style="color: var(--heat-blue-800);">Electric Motors - IE Class</h4>
+                            <p class="text-sm mb-2">IEC 60034-30-1 International Efficiency classification.</p>
+                            <table class="w-full text-sm">
+                                <tr class="border-b"><td class="py-1">IE1 Standard</td><td class="text-right">~80% efficient</td></tr>
+                                <tr class="border-b"><td class="py-1">IE2 High Efficiency</td><td class="text-right">~86% efficient</td></tr>
+                                <tr class="border-b"><td class="py-1">IE3 Premium</td><td class="text-right">~91% efficient</td></tr>
+                                <tr><td class="py-1">IE4 Super Premium</td><td class="text-right">~93% efficient</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Lighting -->
+                        <div>
+                            <h4 class="font-semibold mb-2" style="color: var(--heat-blue-800);">Lighting - Efficacy (lm/W)</h4>
+                            <p class="text-sm mb-2">Lumens per watt measures light output efficiency.</p>
+                            <table class="w-full text-sm">
+                                <tr class="border-b"><td class="py-1">Incandescent</td><td class="text-right">~12 lm/W</td></tr>
+                                <tr class="border-b"><td class="py-1">CFL</td><td class="text-right">~60 lm/W</td></tr>
+                                <tr class="border-b"><td class="py-1">LED Basic (MEPS)</td><td class="text-right">≥80 lm/W</td></tr>
+                                <tr><td class="py-1">LED Premium</td><td class="text-right">≥120 lm/W</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Sources Section (hidden by default) -->
+            <div id="section-sources" class="hidden">
+                <!-- Primary Data Sources -->
+                <div class="bg-white rounded-lg shadow-sm border p-6 mb-6" style="border-color: var(--heat-line);">
+                    <h3 class="font-semibold heat-heading text-lg mb-4"><i class="fa-solid fa-file-lines mr-2"></i>Primary Data Sources</h3>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <!-- IEA -->
+                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded border-l-4" style="border-color: var(--heat-blue-600);">
+                            <div>
+                                <h4 class="font-semibold" style="color: var(--heat-blue-800);">International Energy Agency (IEA)</h4>
+                                <p class="text-sm text-gray-600 mb-2">Grid emission factors, electricity prices, Africa Energy Outlook</p>
+                                <ul class="text-xs text-gray-500 space-y-1">
+                                    <li>• <a href="https://www.iea.org/data-and-statistics/data-product/emissions-factors-2024" target="_blank" class="underline">Emissions Factors 2024</a> - 150+ countries</li>
+                                    <li>• <a href="https://www.iea.org/reports/africa-energy-outlook-2022" target="_blank" class="underline">Africa Energy Outlook 2022</a></li>
+                                    <li>• <a href="https://www.iea.org/data-and-statistics/data-product/energy-prices" target="_blank" class="underline">Energy Prices Database</a></li>
+                                </ul>
+                                <p class="text-xs mt-2 font-medium" style="color: var(--heat-green-600);">Last updated: June 2024</p>
+                            </div>
+                        </div>
+
+                        <!-- U4E -->
+                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded border-l-4" style="border-color: var(--heat-green);">
+                            <div>
+                                <h4 class="font-semibold" style="color: var(--heat-blue-800);">United for Efficiency (U4E/UNEP)</h4>
+                                <p class="text-sm text-gray-600 mb-2">MEPS levels, market assessments, appliance standards</p>
+                                <ul class="text-xs text-gray-500 space-y-1">
+                                    <li>• <a href="https://united4efficiency.org/resources/model-regulation-guidelines/" target="_blank" class="underline">Model Regulation Guidelines</a> - Levels 1-5</li>
+                                    <li>• <a href="https://united4efficiency.org/resources/" target="_blank" class="underline">EAC/SADC Market Assessment</a></li>
+                                    <li>• <a href="https://united4efficiency.org/wp-content/uploads/2024/02/Final-Report-ACs-Market-Assessment-in-Nigeria_20240222.pdf" target="_blank" class="underline">Nigeria AC Assessment 2024</a></li>
+                                </ul>
+                                <p class="text-xs mt-2 font-medium" style="color: var(--heat-green-600);">Last updated: February 2024</p>
+                            </div>
+                        </div>
+
+                        <!-- CLASP -->
+                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded border-l-4" style="border-color: var(--heat-orange);">
+                            <div>
+                                <h4 class="font-semibold" style="color: var(--heat-blue-800);">CLASP</h4>
+                                <p class="text-sm text-gray-600 mb-2">Efficiency benchmarks, market data, policy database</p>
+                                <ul class="text-xs text-gray-500 space-y-1">
+                                    <li>• <a href="https://www.clasp.ngo/tools/worlds-best-meps/" target="_blank" class="underline">World's Best MEPS Database</a></li>
+                                    <li>• <a href="https://www.clasp.ngo/research/all/scoping-study-of-african-air-conditioner-markets/" target="_blank" class="underline">Africa AC Market Scoping Study</a></li>
+                                    <li>• <a href="https://www.clasp.ngo/tools/" target="_blank" class="underline">Global Appliance Policy Database</a></li>
+                                </ul>
+                                <p class="text-xs mt-2 font-medium" style="color: var(--heat-green-600);">Last updated: October 2024</p>
+                            </div>
+                        </div>
+
+                        <!-- GlobalPetrolPrices / Other -->
+                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded border-l-4" style="border-color: var(--heat-blue-800);">
+                            <div>
+                                <h4 class="font-semibold" style="color: var(--heat-blue-800);">Electricity Tariffs & IPCC</h4>
+                                <p class="text-sm text-gray-600 mb-2">Country-specific electricity prices, default emission factors</p>
+                                <ul class="text-xs text-gray-500 space-y-1">
+                                    <li>• <a href="https://www.globalpetrolprices.com/electricity_prices/" target="_blank" class="underline">GlobalPetrolPrices.com</a> - Dec 2024</li>
+                                    <li>• <a href="https://www.statista.com/statistics/1277594/household-electricity-prices-in-africa-by-country/" target="_blank" class="underline">Statista Africa Electricity Prices</a></li>
+                                    <li>• <a href="https://www.ipcc-nggip.iges.or.jp/EFDB/main.php" target="_blank" class="underline">IPCC Emission Factor Database</a></li>
+                                </ul>
+                                <p class="text-xs mt-2 font-medium" style="color: var(--heat-green-600);">Last updated: December 2024</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AFREC -->
+                    <div class="flex items-start gap-4 p-4 bg-gray-50 rounded border-l-4 mb-4" style="border-color: var(--heat-green-600);">
+                        <div>
+                            <h4 class="font-semibold" style="color: var(--heat-blue-800);">AFREC - African Energy Commission (AU)</h4>
+                            <p class="text-sm text-gray-600">Continental coordination on harmonized MEPS standards. AU MEPS Meeting Report - Addis Ababa, December 2024.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gap-Filling Methodology -->
+                <div class="bg-white rounded-lg shadow-sm border p-6 mb-6" style="border-color: var(--heat-line);">
+                    <h3 class="font-semibold heat-heading text-lg mb-4"><i class="fa-solid fa-puzzle-piece mr-2"></i>Gap-Filling Methodology</h3>
+                    <p class="text-sm text-gray-600 mb-4">When country-specific data is unavailable, the following approaches are applied:</p>
+
+                    <div class="space-y-4">
+                        <div class="border-l-4 pl-4" style="border-color: var(--heat-blue-600);">
+                            <h4 class="font-semibold text-sm" style="color: var(--heat-blue-800);">Grid Emission Factors</h4>
+                            <ul class="text-sm text-gray-600 mt-1 space-y-1">
+                                <li><strong>Primary:</strong> IEA Emissions Factors 2024 (country-specific where available)</li>
+                                <li><strong>Secondary:</strong> IPCC Tier 1 default factors by fuel mix</li>
+                                <li><strong>Fallback:</strong> Regional average (Sub-Saharan Africa: 0.50 kgCO₂/kWh)</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-l-4 pl-4" style="border-color: var(--heat-orange);">
+                            <h4 class="font-semibold text-sm" style="color: var(--heat-blue-800);">Electricity Tariffs</h4>
+                            <ul class="text-sm text-gray-600 mt-1 space-y-1">
+                                <li><strong>Primary:</strong> National utility tariffs (Dec 2024)</li>
+                                <li><strong>Secondary:</strong> GlobalPetrolPrices.com database</li>
+                                <li><strong>Fallback:</strong> Regional average (Africa: $0.134/kWh residential)</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-l-4 pl-4" style="border-color: var(--heat-green);">
+                            <h4 class="font-semibold text-sm" style="color: var(--heat-blue-800);">Appliance Stock</h4>
+                            <ul class="text-sm text-gray-600 mt-1 space-y-1">
+                                <li><strong>Primary:</strong> U4E/CLASP market assessments (country-specific)</li>
+                                <li><strong>Secondary:</strong> IEA Africa Outlook extrapolations</li>
+                                <li><strong>Fallback:</strong> Population × ownership rate (AC: 5-15%, Refrigerator: 20-40%)</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-l-4 pl-4" style="border-color: var(--heat-red);">
+                            <h4 class="font-semibold text-sm" style="color: var(--heat-blue-800);">Appliance Prices</h4>
+                            <ul class="text-sm text-gray-600 mt-1 space-y-1">
+                                <li><strong>Primary:</strong> CLASP market studies, U4E assessments</li>
+                                <li><strong>Secondary:</strong> Online retailer surveys (Jumia, etc.)</li>
+                                <li><strong>Fallback:</strong> Regional average (AC: $380-450 USD, Refrigerator: $300-400 USD)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 rounded text-sm" style="background: rgba(255,87,33,0.1); color: var(--heat-orange);">
+                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                        <strong>Uncertainty:</strong> Gap-filled values are marked in the database. Typical uncertainty ranges: Grid factors ±10%, Tariffs ±5%, Stock ±30%, Prices ±20%.
+                    </div>
+                </div>
+
+                <!-- Data Quality -->
+                <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
+                    <h3 class="font-semibold heat-heading text-lg mb-4"><i class="fa-solid fa-shield-check mr-2"></i>Data Quality Assurance</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <ul class="text-sm space-y-2">
+                            <li><i class="fa-solid fa-check text-green-600 mr-2"></i>Country data verified against official standards bodies</li>
+                            <li><i class="fa-solid fa-check text-green-600 mr-2"></i>Regional status confirmed with SADC, ECOWAS, EAC</li>
+                            <li><i class="fa-solid fa-check text-green-600 mr-2"></i>CSPF/EEI/IE cross-referenced with U4E Model Regs</li>
+                        </ul>
+                        <ul class="text-sm space-y-2">
+                            <li><i class="fa-solid fa-check text-green-600 mr-2"></i>Emission factors aligned with IPCC guidelines</li>
+                            <li><i class="fa-solid fa-check text-green-600 mr-2"></i>Tariffs updated quarterly from national utilities</li>
+                            <li><i class="fa-solid fa-check text-green-600 mr-2"></i>Database last updated: December 2024</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regional Contacts Section (hidden by default) -->
+            <div id="section-contacts" class="hidden">
+                <div class="grid grid-cols-2 gap-6">
+                    <!-- SADC -->
+                    <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg width="40" height="20"><line x1="0" y1="10" x2="40" y2="10" stroke="#005ca8" stroke-width="4" stroke-dasharray="8,4"/></svg>
+                            <h3 class="font-semibold heat-heading text-lg">SADC - Southern African Development Community</h3>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="font-semibold">SACREEE - SADC Centre for Renewable Energy and Energy Efficiency</p>
+                                <p class="text-gray-600">Plot 1224, First Floor, Albeka Building</p>
+                                <p class="text-gray-600">Windhoek, Namibia</p>
+                            </div>
+                            <div>
+                                <p><i class="fa-solid fa-envelope mr-2" style="color: var(--heat-blue-600);"></i>info@sacreee.org</p>
+                                <p><i class="fa-solid fa-globe mr-2" style="color: var(--heat-blue-600);"></i><a href="https://www.sacreee.org" target="_blank">www.sacreee.org</a></p>
+                            </div>
+                            <div class="pt-2 border-t">
+                                <p class="font-semibold">SADCSTAN Coordination</p>
+                                <p class="text-gray-600">Harmonized MEPS: Lighting, Cooling, Motors</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ECOWAS -->
+                    <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg width="40" height="20"><line x1="0" y1="10" x2="40" y2="10" stroke="#62d32f" stroke-width="4" stroke-dasharray="8,4"/></svg>
+                            <h3 class="font-semibold heat-heading text-lg">ECOWAS - Economic Community of West African States</h3>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="font-semibold">ECREEE - ECOWAS Centre for Renewable Energy and Energy Efficiency</p>
+                                <p class="text-gray-600">Achada Santo António, C.P. 288</p>
+                                <p class="text-gray-600">Praia, Cabo Verde</p>
+                            </div>
+                            <div>
+                                <p><i class="fa-solid fa-envelope mr-2" style="color: var(--heat-green);"></i>info@ecreee.org</p>
+                                <p><i class="fa-solid fa-globe mr-2" style="color: var(--heat-green);"></i><a href="https://www.ecreee.org" target="_blank">www.ecreee.org</a></p>
+                            </div>
+                            <div class="pt-2 border-t">
+                                <p class="font-semibold">Regional Directives</p>
+                                <p class="text-gray-600">Lighting, Air Conditioners, Refrigerators</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EAC -->
+                    <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
+                        <div class="flex items-center gap-3 mb-4">
+                            <svg width="40" height="20"><line x1="0" y1="10" x2="40" y2="10" stroke="#ff5721" stroke-width="4" stroke-dasharray="8,4"/></svg>
+                            <h3 class="font-semibold heat-heading text-lg">EAC - East African Community</h3>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="font-semibold">EACREEE - East African Centre for Renewable Energy and Energy Efficiency</p>
+                                <p class="text-gray-600">KG 7 Ave, Kigali</p>
+                                <p class="text-gray-600">Rwanda</p>
+                            </div>
+                            <div>
+                                <p><i class="fa-solid fa-envelope mr-2" style="color: var(--heat-orange);"></i>info@eacreee.org</p>
+                                <p><i class="fa-solid fa-globe mr-2" style="color: var(--heat-orange);"></i><a href="https://www.eacreee.org" target="_blank">www.eacreee.org</a></p>
+                            </div>
+                            <div class="pt-2 border-t">
+                                <p class="font-semibold">EAC Harmonized Standards</p>
+                                <p class="text-gray-600">Aligned with SADC, national enforcement</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AFREC -->
+                    <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: var(--heat-blue-800); color: white;">
+                                <i class="fa-solid fa-earth-africa"></i>
+                            </div>
+                            <h3 class="font-semibold heat-heading text-lg">AFREC - African Energy Commission</h3>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="font-semibold">African Union Commission</p>
+                                <p class="text-gray-600">Roosevelt Street, W21K19</p>
+                                <p class="text-gray-600">Addis Ababa, Ethiopia</p>
+                            </div>
+                            <div>
+                                <p><i class="fa-solid fa-envelope mr-2" style="color: var(--heat-blue-800);"></i>afrec@africa-union.org</p>
+                                <p><i class="fa-solid fa-globe mr-2" style="color: var(--heat-blue-800);"></i><a href="https://au-afrec.org" target="_blank">au-afrec.org</a></p>
+                            </div>
+                            <div class="pt-2 border-t">
+                                <p class="font-semibold">Continental Coordination</p>
+                                <p class="text-gray-600">Pan-African energy efficiency policy harmonization</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Password Protection
+        const ACCESS_CODE = 'HEAT2026';
+        const SESSION_KEY = 'au_meps_access';
+
+        function checkPassword(e) {
+            e.preventDefault();
+            const input = document.getElementById('password-input').value;
+            const errorEl = document.getElementById('password-error');
+
+            if (input === ACCESS_CODE) {
+                sessionStorage.setItem(SESSION_KEY, 'granted');
+                document.getElementById('password-modal').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                // Wait for layout then init map
+                setTimeout(function() {
+                    if (typeof initMap === 'function') {
+                        initMap();
+                    } else {
+                        console.error('initMap not defined');
+                    }
+                }, 200);
+            } else {
+                errorEl.classList.remove('hidden');
+                document.getElementById('password-input').value = '';
+                document.getElementById('password-input').focus();
+            }
+        }
+
+        // Check session on load
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem(SESSION_KEY) === 'granted') {
+                document.getElementById('password-modal').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                setTimeout(function() {
+                    if (typeof initMap === 'function') {
+                        initMap();
+                    }
+                }, 200);
+            }
+        });
+    </script>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://lwketrcirgxeizevfdfs.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3a2V0cmNpcmd4ZWl6ZXZmZGZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NzExNTQsImV4cCI6MjA4MDU0NzE1NH0.MFQqwiPY7xOXPdBS8OURYUWFIfZ9WIt8yZcuwixFwtk';
+
+        // Initialize data
+        let COUNTRY_DATA = {}; // Will be populated from Supabase or fallback
+
+        // Fallback data (used if Supabase unavailable)
+        const FALLBACK_DATA = {
+            "Algeria": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Egypt": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Ghana": { region: "ECOWAS", status: "Mandatory", motors: "Mandatory (IE2)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Kenya": { region: "EAC", status: "Mandatory", motors: "Mandatory (IE3-eq)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Morocco": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "South Africa": { region: "SADC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" }
+        };
+
+        // Fetch data from Supabase using REST API directly (more reliable than JS client)
+        async function fetchCountryData() {
+            if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('PASTE')) {
+                console.log('Supabase key not configured, using embedded data');
+                return null;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/meps_country_data?select=*`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+
+                // Transform to COUNTRY_DATA format
+                const countryData = {};
+                data.forEach(row => {
+                    const motorsStatus = row.motors_status === 'Mandatory'
+                        ? `Mandatory (${row.motors_level || 'IE3'})`
+                        : row.motors_status;
+
+                    countryData[row.country_name] = {
+                        region: row.region,
+                        status: row.meps_status,
+                        motors: motorsStatus,
+                        rac: row.rac_status,
+                        lighting: row.lighting_status,
+                        refrigeration: row.refrigeration_status,
+                        // Extended data from Supabase
+                        rac_cspf_min: row.rac_cspf_min,
+                        rac_cspf_target: row.rac_cspf_target,
+                        refrigeration_eei_max: row.refrigeration_eei_max,
+                        motors_level: row.motors_level,
+                        lighting_efficacy_min: row.lighting_efficacy_min,
+                        electricity_tariff: row.electricity_tariff,
+                        grid_emission_factor: row.grid_emission_factor,
+                        // Energy savings data
+                        ac_stock_thousands: row.ac_stock_thousands,
+                        refrigerator_stock_thousands: row.refrigerator_stock_thousands,
+                        total_savings_potential_gwh: row.total_savings_potential_gwh,
+                        total_co2_reduction_kt: row.total_co2_reduction_kt,
+                        total_cost_savings_musd: row.total_cost_savings_musd,
+                        optimal_ac_cspf: row.optimal_ac_cspf,
+                        optimal_refrigerator_eei: row.optimal_refrigerator_eei,
+                        optimal_motor_ie: row.optimal_motor_ie,
+                        avg_ac_price_usd: row.avg_ac_price_usd,
+                        avg_refrigerator_price_usd: row.avg_refrigerator_price_usd,
+                        savings_methodology: row.savings_methodology,
+                        data_sources: row.data_sources
+                    };
+                });
+
+                console.log(`Loaded ${Object.keys(countryData).length} countries from Supabase`);
+                return countryData;
+            } catch (err) {
+                console.error('Supabase fetch error:', err);
+                return null;
+            }
+        }
+
+        // HEAT Brand Colors
+        const HEAT = {
+            green: '#62d32f',
+            green600: '#00953c',
+            blue600: '#005ca8',
+            blue800: '#003e51',
+            text: '#114a7d',
+            orange: '#ff5721',
+            red: '#c21632',
+            line: '#d9e1e8'
+        };
+
+        // Embedded country data (fallback if Supabase unavailable)
+        const EMBEDDED_DATA = {
+            "Algeria": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Angola": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Benin": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Botswana": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Burkina Faso": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Burundi": { region: "EAC", status: "Regional (Harmonized)", motors: "Regional (Development)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Cameroon": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Cabo Verde": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Central African Republic": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Chad": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Comoros": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Congo": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Cote d'Ivoire": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Democratic Republic of the Congo": { region: "SADC, EAC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Djibouti": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Egypt": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Equatorial Guinea": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Eritrea": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Eswatini": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Ethiopia": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Gabon": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Gambia": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Ghana": { region: "ECOWAS", status: "Mandatory", motors: "Mandatory (IE2)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Guinea": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Guinea-Bissau": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Kenya": { region: "EAC", status: "Mandatory", motors: "Mandatory (IE3-eq)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Lesotho": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Liberia": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Libya": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Madagascar": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Malawi": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Mali": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Mauritania": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Mauritius": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Morocco": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Mozambique": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Namibia": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Niger": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Nigeria": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Mandatory", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Rwanda": { region: "EAC", status: "Mandatory", motors: "Regional (Development)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Sao Tome and Principe": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Senegal": { region: "ECOWAS", status: "Regional (Development)", motors: "Mandatory (IE3)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Seychelles": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Sierra Leone": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Somalia": { region: "EAC", status: "Regional (Harmonized)", motors: "Regional (Development)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "South Africa": { region: "SADC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "South Sudan": { region: "EAC", status: "Regional (Harmonized)", motors: "Regional (Development)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Sudan": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
+            "Tanzania": { region: "SADC, EAC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Togo": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Tunisia": { region: "AFREC", status: "Mandatory", motors: "None", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Uganda": { region: "EAC", status: "Mandatory", motors: "Regional (Development)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Zambia": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Zimbabwe": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" }
+        };
+
+        // Regional groupings
+        const REGIONS = {
+            SADC: ["Angola", "Botswana", "Comoros", "Democratic Republic of the Congo", "Eswatini", "Lesotho", "Madagascar", "Malawi", "Mauritius", "Mozambique", "Namibia", "Seychelles", "South Africa", "Tanzania", "Zambia", "Zimbabwe"],
+            ECOWAS: ["Benin", "Burkina Faso", "Cape Verde", "Cote d'Ivoire", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Liberia", "Mali", "Niger", "Nigeria", "Senegal", "Sierra Leone", "Togo"],
+            EAC: ["Burundi", "Kenya", "Rwanda", "South Sudan", "Tanzania", "Uganda", "Democratic Republic of the Congo", "Somalia"]
+        };
+
+        const REGION_STYLES = {
+            SADC: { color: HEAT.blue600, dash: '8,4', width: 4 },
+            ECOWAS: { color: HEAT.green, dash: '8,4', width: 4 },
+            EAC: { color: HEAT.orange, dash: '8,4', width: 4 }
+        };
+
+        let currentView = 'overview';
+        let svg, geoData, path;
+        const tooltip = document.getElementById('tooltip');
+
+        // Get color based on status (HEAT palette)
+        function getColor(status) {
+            if (status.includes('Mandatory')) return HEAT.green600;
+            if (status.includes('Harmonized')) return HEAT.blue600;
+            if (status.includes('Directive') || status.includes('Development')) return HEAT.orange;
+            return '#cbd5e1';
+        }
+
+        // Get status for current view
+        function getStatus(countryName) {
+            const data = COUNTRY_DATA[countryName];
+            if (!data) return 'None';
+            switch(currentView) {
+                case 'motors': return data.motors;
+                case 'rac': return data.rac;
+                case 'lighting': return data.lighting;
+                case 'refrigeration': return data.refrigeration;
+                default: return data.status;
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            let mandatory = 0, regional = 0, dev = 0, none = 0;
+            Object.keys(COUNTRY_DATA).forEach(country => {
+                const status = getStatus(country);
+                if (status.includes('Mandatory')) mandatory++;
+                else if (status.includes('Harmonized')) regional++;
+                else if (status.includes('Directive') || status.includes('Development')) dev++;
+                else none++;
+            });
+            document.getElementById('stat-mandatory').textContent = mandatory;
+            document.getElementById('stat-regional').textContent = regional;
+            document.getElementById('stat-dev').textContent = dev;
+            document.getElementById('stat-none').textContent = none;
+        }
+
+        // Update map colors
+        function updateMap() {
+            if (!svg) return;
+            svg.selectAll('path.country')
+                .transition()
+                .duration(300)
+                .attr('fill', d => getColor(getStatus(d.properties.name)));
+        }
+
+        // Get status badge HTML with color
+        function getStatusBadge(status) {
+            let bgColor = '#e5e7eb';
+            let textColor = '#6b7280';
+
+            if (status && status.includes('Mandatory')) {
+                bgColor = HEAT.green600;
+                textColor = 'white';
+            } else if (status && status.includes('Harmonized')) {
+                bgColor = HEAT.blue600;
+                textColor = 'white';
+            } else if (status && (status.includes('Directive') || status.includes('Development'))) {
+                bgColor = HEAT.orange;
+                textColor = 'white';
+            }
+
+            return { bg: bgColor, text: textColor, label: status || 'None' };
+        }
+
+        // Show country detail panel
+        function showCountryPanel(countryName) {
+            const data = COUNTRY_DATA[countryName];
+            if (!data) return;
+
+            selectedCountry = countryName;
+            document.getElementById('panel-country-name').textContent = countryName;
+            document.getElementById('panel-region').textContent = data.region || 'N/A';
+
+            // Status badges
+            const statusBadge = getStatusBadge(data.status);
+            const statusEl = document.getElementById('panel-status');
+            statusEl.textContent = statusBadge.label;
+            statusEl.style.background = statusBadge.bg;
+            statusEl.style.color = statusBadge.text;
+            statusEl.style.padding = '2px 8px';
+            statusEl.style.borderRadius = '4px';
+
+            // Label status (from Supabase data or derived)
+            const labelStatus = data.label_status || data.status || 'None';
+            const labelBadge = getStatusBadge(labelStatus);
+            const labelEl = document.getElementById('panel-label');
+            labelEl.textContent = labelBadge.label;
+            labelEl.style.background = labelBadge.bg;
+            labelEl.style.color = labelBadge.text;
+            labelEl.style.padding = '2px 8px';
+            labelEl.style.borderRadius = '4px';
+
+            // Appliance statuses
+            const appliances = ['rac', 'refrigeration', 'lighting', 'motors'];
+            appliances.forEach(app => {
+                const appStatus = data[app] || 'None';
+                const badge = getStatusBadge(appStatus);
+                const el = document.getElementById(`panel-${app}`);
+                el.textContent = badge.label;
+                el.style.background = badge.bg;
+                el.style.color = badge.text;
+            });
+
+            // Additional metrics if available from Supabase
+            const metricsEl = document.getElementById('panel-metrics');
+            let metricsHtml = '';
+
+            if (data.rac_cspf_min) {
+                metricsHtml += `<div>AC CSPF: ${data.rac_cspf_min}${data.rac_cspf_target ? ' → ' + data.rac_cspf_target : ''}</div>`;
+            }
+            if (data.refrigeration_eei_max) {
+                metricsHtml += `<div>Refrigerator EEI: ≤${data.refrigeration_eei_max}</div>`;
+            }
+            if (data.motors_level) {
+                metricsHtml += `<div>Motors: ${data.motors_level}</div>`;
+            }
+            if (data.lighting_efficacy_min) {
+                metricsHtml += `<div>Lighting: ≥${data.lighting_efficacy_min} lm/W</div>`;
+            }
+            if (data.electricity_tariff) {
+                metricsHtml += `<div>Electricity: $${data.electricity_tariff}/kWh</div>`;
+            }
+
+            metricsEl.innerHTML = metricsHtml || '<div class="text-gray-400">No detailed metrics available</div>';
+
+            // Show panel
+            document.getElementById('country-panel').classList.remove('hidden');
+        }
+
+        // Close country panel
+        function closePanel() {
+            document.getElementById('country-panel').classList.add('hidden');
+        }
+
+        // Current selected country for modal
+        let selectedCountry = null;
+
+        // Open full country detail modal
+        function openCountryDetail() {
+            if (!selectedCountry) return;
+            const data = COUNTRY_DATA[selectedCountry];
+            if (!data) return;
+
+            document.getElementById('modal-country-name').textContent = selectedCountry;
+
+            const statusBadge = getStatusBadge(data.status);
+            const labelBadge = getStatusBadge(data.label_status || data.status);
+
+            let html = `
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm text-gray-500 mb-1">Region</div>
+                        <div class="font-semibold text-lg">${data.region || 'N/A'}</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm text-gray-500 mb-1">MEPS Status</div>
+                        <span class="inline-block px-3 py-1 rounded font-medium" style="background: ${statusBadge.bg}; color: ${statusBadge.text};">${statusBadge.label}</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-bold text-lg mb-3" style="color: var(--heat-blue-800);">
+                        <i class="fa-solid fa-tag mr-2"></i>Energy Labeling
+                    </h3>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span>Labeling Program Status</span>
+                            <span class="px-3 py-1 rounded font-medium" style="background: ${labelBadge.bg}; color: ${labelBadge.text};">${labelBadge.label}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-bold text-lg mb-3" style="color: var(--heat-blue-800);">
+                        <i class="fa-solid fa-list-check mr-2"></i>MEPS by Appliance
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+            `;
+
+            // Appliance cards
+            const appliances = [
+                { key: 'rac', name: 'Air Conditioners', icon: 'snowflake', metric: 'CSPF', minKey: 'rac_cspf_min', targetKey: 'rac_cspf_target' },
+                { key: 'refrigeration', name: 'Refrigerators', icon: 'box-archive', metric: 'EEI', maxKey: 'refrigeration_eei_max' },
+                { key: 'lighting', name: 'Lighting', icon: 'lightbulb', metric: 'lm/W', minKey: 'lighting_efficacy_min' },
+                { key: 'motors', name: 'Electric Motors', icon: 'gear', metric: 'IE Class', levelKey: 'motors_level' }
+            ];
+
+            appliances.forEach(app => {
+                const appStatus = data[app.key] || 'None';
+                const badge = getStatusBadge(appStatus);
+
+                let metricHtml = '';
+                if (app.minKey && data[app.minKey]) {
+                    metricHtml = `<div class="text-sm text-gray-600 mt-2">Min: ${data[app.minKey]} ${app.metric}</div>`;
+                    if (app.targetKey && data[app.targetKey]) {
+                        metricHtml += `<div class="text-sm text-gray-600">Target: ${data[app.targetKey]} ${app.metric}</div>`;
+                    }
+                }
+                if (app.maxKey && data[app.maxKey]) {
+                    metricHtml = `<div class="text-sm text-gray-600 mt-2">Max: ${data[app.maxKey]} ${app.metric}</div>`;
+                }
+                if (app.levelKey && data[app.levelKey]) {
+                    metricHtml = `<div class="text-sm text-gray-600 mt-2">Level: ${data[app.levelKey]}</div>`;
+                }
+
+                html += `
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fa-solid fa-${app.icon}" style="color: var(--heat-blue-600);"></i>
+                            <span class="font-medium">${app.name}</span>
+                        </div>
+                        <span class="inline-block px-2 py-1 rounded text-xs font-medium" style="background: ${badge.bg}; color: ${badge.text};">${badge.label}</span>
+                        ${metricHtml}
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+
+            // Enforcement & Implementation
+            html += `
+                <div class="mb-6">
+                    <h3 class="font-bold text-lg mb-3" style="color: var(--heat-blue-800);">
+                        <i class="fa-solid fa-gavel mr-2"></i>Enforcement & Implementation
+                    </h3>
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-3">
+            `;
+
+            if (data.status === 'Mandatory') {
+                html += `<div class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-green-600"></i> Mandatory enforcement in place</div>`;
+            } else if (data.status && data.status.includes('Harmonized')) {
+                html += `<div class="flex items-center gap-2"><i class="fa-solid fa-handshake text-blue-600"></i> Regional harmonized standards adopted</div>`;
+            } else if (data.status && data.status.includes('Development')) {
+                html += `<div class="flex items-center gap-2"><i class="fa-solid fa-clock text-orange-500"></i> Standards under development</div>`;
+            } else {
+                html += `<div class="flex items-center gap-2"><i class="fa-solid fa-minus-circle text-gray-400"></i> No MEPS currently in place</div>`;
+            }
+
+            html += `</div></div>`;
+
+            // Energy Savings Potential Section
+            if (data.total_savings_potential_gwh || data.total_co2_reduction_kt) {
+                html += `
+                    <div class="mb-6">
+                        <h3 class="font-bold text-lg mb-3" style="color: var(--heat-blue-800);">
+                            <i class="fa-solid fa-leaf mr-2"></i>Energy Savings Potential
+                        </h3>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                `;
+
+                if (data.total_savings_potential_gwh) {
+                    html += `
+                        <div class="bg-green-50 p-4 rounded-lg border-l-4" style="border-color: var(--heat-green);">
+                            <div class="text-sm text-gray-500">Energy Savings</div>
+                            <div class="font-bold text-xl" style="color: var(--heat-green-600);">${data.total_savings_potential_gwh} GWh/yr</div>
+                            <div class="text-xs text-gray-400 mt-1">From optimal MEPS adoption</div>
+                        </div>
+                    `;
+                }
+                if (data.total_co2_reduction_kt) {
+                    html += `
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4" style="border-color: var(--heat-blue-600);">
+                            <div class="text-sm text-gray-500">CO₂ Reduction</div>
+                            <div class="font-bold text-xl" style="color: var(--heat-blue-600);">${data.total_co2_reduction_kt.toLocaleString()} ktCO₂/yr</div>
+                            <div class="text-xs text-gray-400 mt-1">Based on grid emission factor</div>
+                        </div>
+                    `;
+                }
+                if (data.total_cost_savings_musd) {
+                    html += `
+                        <div class="bg-orange-50 p-4 rounded-lg border-l-4" style="border-color: var(--heat-orange);">
+                            <div class="text-sm text-gray-500">Cost Savings</div>
+                            <div class="font-bold text-xl" style="color: var(--heat-orange);">$${data.total_cost_savings_musd.toLocaleString()}M/yr</div>
+                            <div class="text-xs text-gray-400 mt-1">At current electricity tariff</div>
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+
+                // Optimal MEPS recommendations
+                if (data.optimal_ac_cspf || data.optimal_refrigerator_eei) {
+                    html += `
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-xs font-semibold uppercase text-gray-400 mb-2">Recommended MEPS Levels (U4E Guidelines)</div>
+                            <div class="grid grid-cols-3 gap-4 text-sm">
+                    `;
+                    if (data.optimal_ac_cspf) {
+                        html += `<div><span class="text-gray-500">AC CSPF:</span> <span class="font-medium">≥${data.optimal_ac_cspf}</span></div>`;
+                    }
+                    if (data.optimal_refrigerator_eei) {
+                        html += `<div><span class="text-gray-500">Refrigerator EEI:</span> <span class="font-medium">≤${data.optimal_refrigerator_eei}</span></div>`;
+                    }
+                    if (data.optimal_motor_ie) {
+                        html += `<div><span class="text-gray-500">Motors:</span> <span class="font-medium">${data.optimal_motor_ie}</span></div>`;
+                    }
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
+            }
+
+            // Energy Context (grid factor and tariff)
+            if (data.electricity_tariff || data.grid_emission_factor) {
+                html += `
+                    <div class="mb-6">
+                        <h3 class="font-bold text-lg mb-3" style="color: var(--heat-blue-800);">
+                            <i class="fa-solid fa-bolt mr-2"></i>Energy Context
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                `;
+                if (data.electricity_tariff) {
+                    html += `<div class="bg-gray-50 p-4 rounded-lg"><div class="text-sm text-gray-500">Electricity Tariff</div><div class="font-semibold">$${data.electricity_tariff}/kWh</div><div class="text-xs text-gray-400 mt-1">Source: GlobalPetrolPrices Dec 2024</div></div>`;
+                }
+                if (data.grid_emission_factor) {
+                    html += `<div class="bg-gray-50 p-4 rounded-lg"><div class="text-sm text-gray-500">Grid Emission Factor</div><div class="font-semibold">${data.grid_emission_factor} kgCO₂/kWh</div><div class="text-xs text-gray-400 mt-1">Source: IEA Emissions Factors 2024</div></div>`;
+                }
+                html += `</div></div>`;
+            }
+
+            // Appliance Market Data
+            if (data.ac_stock_thousands || data.avg_ac_price_usd) {
+                html += `
+                    <div class="mb-6">
+                        <h3 class="font-bold text-lg mb-3" style="color: var(--heat-blue-800);">
+                            <i class="fa-solid fa-box mr-2"></i>Appliance Market
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                `;
+                if (data.ac_stock_thousands) {
+                    html += `<div class="bg-gray-50 p-4 rounded-lg"><div class="text-sm text-gray-500">AC Stock</div><div class="font-semibold">${data.ac_stock_thousands.toLocaleString()}k units</div></div>`;
+                }
+                if (data.refrigerator_stock_thousands) {
+                    html += `<div class="bg-gray-50 p-4 rounded-lg"><div class="text-sm text-gray-500">Refrigerator Stock</div><div class="font-semibold">${data.refrigerator_stock_thousands.toLocaleString()}k units</div></div>`;
+                }
+                if (data.avg_ac_price_usd) {
+                    html += `<div class="bg-gray-50 p-4 rounded-lg"><div class="text-sm text-gray-500">Avg AC Price</div><div class="font-semibold">$${data.avg_ac_price_usd}</div></div>`;
+                }
+                if (data.avg_refrigerator_price_usd) {
+                    html += `<div class="bg-gray-50 p-4 rounded-lg"><div class="text-sm text-gray-500">Avg Refrigerator Price</div><div class="font-semibold">$${data.avg_refrigerator_price_usd}</div></div>`;
+                }
+                html += `</div></div>`;
+            }
+
+            // Data Sources Attribution
+            if (data.data_sources || data.savings_methodology) {
+                html += `
+                    <div class="border-t pt-4 mt-4" style="border-color: var(--heat-line);">
+                        <div class="text-xs text-gray-500">
+                            <i class="fa-solid fa-database mr-1"></i>
+                            <strong>Data Sources:</strong> ${data.data_sources || 'IEA, CLASP, U4E, GlobalPetrolPrices'}
+                        </div>
+                `;
+                if (data.savings_methodology) {
+                    html += `<div class="text-xs text-gray-400 mt-1"><i class="fa-solid fa-calculator mr-1"></i> ${data.savings_methodology}</div>`;
+                }
+                html += `</div>`;
+            }
+
+            document.getElementById('modal-content').innerHTML = html;
+            document.getElementById('country-modal').classList.remove('hidden');
+            closePanel();
+        }
+
+        // Close country modal
+        function closeCountryModal() {
+            document.getElementById('country-modal').classList.add('hidden');
+        }
+
+        // Set view
+        function setView(view) {
+            currentView = view;
+            const titles = {
+                overview: 'Regional Overview',
+                motors: 'Electric Motors',
+                rac: 'Room Air Conditioners',
+                lighting: 'Lighting',
+                refrigeration: 'Refrigeration',
+                methodology: 'Calculation Methodology',
+                sources: 'Data Sources & Quality',
+                contacts: 'Regional Contacts'
+            };
+            document.getElementById('title').textContent = titles[view] || 'Dashboard';
+
+            // Update nav
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.style.background = 'transparent';
+            });
+            const navEl = document.getElementById(`nav-${view}`);
+            if (navEl) navEl.style.background = 'rgba(98,211,47,0.2)';
+
+            // Show/hide sections based on view
+            const mapViews = ['overview', 'motors', 'rac', 'lighting', 'refrigeration'];
+            const statsSection = document.querySelector('.grid.grid-cols-4');
+            const mapSection = document.querySelector('.bg-white.rounded-lg.shadow-sm.border.p-4');
+            const methodologySection = document.getElementById('section-methodology');
+            const sourcesSection = document.getElementById('section-sources');
+            const contactsSection = document.getElementById('section-contacts');
+
+            // Hide all content sections
+            if (methodologySection) methodologySection.classList.add('hidden');
+            if (sourcesSection) sourcesSection.classList.add('hidden');
+            if (contactsSection) contactsSection.classList.add('hidden');
+
+            if (mapViews.includes(view)) {
+                // Show map views
+                if (statsSection) statsSection.classList.remove('hidden');
+                if (mapSection) mapSection.classList.remove('hidden');
+                updateStats();
+                updateMap();
+            } else {
+                // Hide map, show content section
+                if (statsSection) statsSection.classList.add('hidden');
+                if (mapSection) mapSection.classList.add('hidden');
+
+                if (view === 'methodology' && methodologySection) {
+                    methodologySection.classList.remove('hidden');
+                } else if (view === 'sources' && sourcesSection) {
+                    sourcesSection.classList.remove('hidden');
+                } else if (view === 'contacts' && contactsSection) {
+                    contactsSection.classList.remove('hidden');
+                }
+            }
+        }
+
+        // Merge geometries to create regional boundary
+        function mergeRegionGeometries(features) {
+            // Collect all coordinates from all polygons
+            const allPolygons = [];
+            features.forEach(f => {
+                if (f.geometry.type === 'Polygon') {
+                    allPolygons.push(f.geometry.coordinates);
+                } else if (f.geometry.type === 'MultiPolygon') {
+                    f.geometry.coordinates.forEach(poly => allPolygons.push(poly));
+                } else if (f.geometry.type === 'GeometryCollection') {
+                    f.geometry.geometries.forEach(g => {
+                        if (g.type === 'Polygon') {
+                            allPolygons.push(g.coordinates);
+                        } else if (g.type === 'MultiPolygon') {
+                            g.coordinates.forEach(poly => allPolygons.push(poly));
+                        }
+                    });
+                }
+            });
+            return {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'MultiPolygon',
+                    coordinates: allPolygons
+                }
+            };
+        }
+
+        // Initialize map
+        async function initMap() {
+            // Try to load from Supabase, fallback to embedded data
+            const supabaseData = await fetchCountryData();
+            COUNTRY_DATA = supabaseData || EMBEDDED_DATA;
+            console.log(`Using ${supabaseData ? 'Supabase' : 'embedded'} data (${Object.keys(COUNTRY_DATA).length} countries)`);
+
+            // Wait for container to have dimensions
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            const container = document.getElementById('map');
+            let width = container.offsetWidth || 800;
+            let height = container.offsetHeight || 500;
+
+            // If still no size, use fallback
+            if (width < 100) width = 800;
+            if (height < 100) height = 500;
+
+            console.log(`Map container: ${width}x${height}`);
+
+            // Clear any existing SVG
+            d3.select('#map svg').remove();
+
+            svg = d3.select('#map')
+                .append('svg')
+                .attr('width', '100%')
+                .attr('height', height)
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet');
+
+            try {
+                geoData = await d3.json('./africa.geojson');
+
+                const projection = d3.geoMercator()
+                    .fitExtent([[10, 10], [width - 10, height - 10]], geoData);
+
+                path = d3.geoPath().projection(projection);
+
+                // Draw countries
+                svg.selectAll('path.country')
+                    .data(geoData.features)
+                    .enter()
+                    .append('path')
+                    .attr('class', 'country')
+                    .attr('d', path)
+                    .attr('fill', d => getColor(getStatus(d.properties.name)))
+                    .attr('stroke', '#f8fafc')
+                    .attr('stroke-width', 0.5)
+                    .style('cursor', 'pointer')
+                    .on('mouseenter', function(event, d) {
+                        d3.select(this).attr('stroke', HEAT.blue800).attr('stroke-width', 1.5);
+                        const data = COUNTRY_DATA[d.properties.name];
+                        tooltip.innerHTML = `<strong>${d.properties.name}</strong><br>Click for details`;
+                        tooltip.style.opacity = 1;
+                    })
+                    .on('mousemove', function(event) {
+                        tooltip.style.left = (event.clientX + 10) + 'px';
+                        tooltip.style.top = (event.clientY + 10) + 'px';
+                    })
+                    .on('mouseleave', function() {
+                        d3.select(this).attr('stroke', '#f8fafc').attr('stroke-width', 0.5);
+                        tooltip.style.opacity = 0;
+                    })
+                    .on('click', function(event, d) {
+                        showCountryPanel(d.properties.name);
+                    });
+
+                // Draw regional boundaries (merged outlines)
+                Object.entries(REGIONS).forEach(([regionName, countries]) => {
+                    const regionFeatures = geoData.features.filter(f => countries.includes(f.properties.name));
+                    if (regionFeatures.length === 0) return;
+
+                    const mergedRegion = mergeRegionGeometries(regionFeatures);
+                    const style = REGION_STYLES[regionName];
+
+                    // White background stroke for contrast
+                    svg.append('path')
+                        .datum(mergedRegion)
+                        .attr('class', `region-bg region-${regionName}-bg`)
+                        .attr('d', path)
+                        .attr('fill', 'none')
+                        .attr('stroke', '#ffffff')
+                        .attr('stroke-width', style.width + 3)
+                        .attr('stroke-linejoin', 'round')
+                        .style('pointer-events', 'none');
+
+                    // Colored dashed stroke
+                    svg.append('path')
+                        .datum(mergedRegion)
+                        .attr('class', `region-boundary region-${regionName}`)
+                        .attr('d', path)
+                        .attr('fill', 'none')
+                        .attr('stroke', style.color)
+                        .attr('stroke-width', style.width)
+                        .attr('stroke-dasharray', style.dash)
+                        .attr('stroke-linejoin', 'round')
+                        .attr('stroke-linecap', 'round')
+                        .style('pointer-events', 'none');
+                });
+
+                updateStats();
+            } catch (error) {
+                console.error('Failed to load map:', error);
+                container.innerHTML = '<p style="color: var(--heat-red); padding: 1rem;">Failed to load map data</p>';
+            }
+        }
+
+        // Map initialization is triggered by password check or session restore
+    </script>
+</body>
+</html>
+<!-- v2 -->
