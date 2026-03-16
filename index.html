@@ -1563,8 +1563,8 @@
             let metricsHtml = '';
 
             if (data.rac_cspf_min) {
-                const isEER = data.rac_metric_type === 'EER_converted';
-                const isNSEER = data.rac_metric_type === 'National_CSPF';
+                const isEER = data.rac_metric_type === 'EER';
+                const isNSEER = data.rac_metric_type === 'NSEER';
                 const suffix = isEER ? '<span title="EER-converted value — not directly comparable to ISO CSPF. See methodology." style="cursor:help;color:#ff5721;"> *</span>'
                              : isNSEER ? '<span title="National metric (NSEER) — climate-bin based, not ISO 16358-1 CSPF. See methodology." style="cursor:help;color:#ff5721;"> †</span>' : '';
                 metricsHtml += `<div>AC CSPF: ${data.rac_cspf_min}${data.rac_cspf_target ? ' → ' + data.rac_cspf_target : ''}${suffix}</div>`;
@@ -1656,8 +1656,8 @@
 
                 let metricHtml = '';
                 if (app.key === 'rac' && app.minKey && data[app.minKey]) {
-                    const isEER   = data.rac_metric_type === 'EER_converted';
-                    const isNSEER = data.rac_metric_type === 'National_CSPF';
+                    const isEER   = data.rac_metric_type === 'EER';
+                    const isNSEER = data.rac_metric_type === 'NSEER';
                     const metricLabel = isNSEER ? 'NSEER' : 'CSPF';
                     const asterisk = isEER
                         ? `<span title="EER-converted — not directly comparable to ISO CSPF" style="cursor:help;color:#ff5721;font-weight:bold;"> *</span>`
