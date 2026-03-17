@@ -1429,7 +1429,8 @@
             "Tunisia": { region: "AFREC", status: "Mandatory", motors: "None", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
             "Uganda": { region: "EAC", status: "Mandatory", motors: "Regional (Development)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
             "Zambia": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
-            "Zimbabwe": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" }
+            "Zimbabwe": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Western Sahara": { region: "N/A", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None", disputed: true, note: "Disputed territory. Administered by Morocco; sovereignty claimed by the Sahrawi Arab Democratic Republic. No national MEPS framework in place." }
         };
 
         // E3: Region helpers for multi-region countries (Tanzania, DRC)
@@ -1547,7 +1548,7 @@
 
             selectedCountry = countryName;
             document.getElementById('panel-country-name').textContent = countryName;
-            document.getElementById('panel-region').textContent = getRegionLabel(data);
+            document.getElementById('panel-region').textContent = data.disputed ? 'Disputed territory' : getRegionLabel(data);
 
             // Status badges
             const statusBadge = getStatusBadge(data.status);
@@ -1604,6 +1605,9 @@
             }
             if (data.no_data_flag) {
                 metricsHtml += `<div style="color:#b45309;margin-top:4px;font-size:0.75rem;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i>Data partially unverified — see status notes</div>`;
+            }
+            if (data.note) {
+                metricsHtml += `<div style="color:#6b7280;margin-top:4px;font-size:0.75rem;font-style:italic;"><i class="fa-solid fa-circle-info" style="margin-right:4px;"></i>${data.note}</div>`;
             }
 
             metricsEl.innerHTML = metricsHtml || '<div class="text-gray-400">No detailed metrics available</div>';
@@ -2202,14 +2206,15 @@
             const candidates = rootEl.querySelectorAll(
               '[id*="panel-status"], [id*="panel-rac"], [id*="panel-refrigeration"], ' +
               '[id*="panel-lighting"], [id*="panel-motors"], ' +
-              '.meps-status-badge, .appliance-status-badge, .d6-badge'
+              '.meps-status-badge, .appliance-status-badge'
             );
             candidates.forEach(el => {
-              if (el.querySelector('.d-cc-tag-tooltip-icon')) return;
-              if (el.classList.contains('d6-badge')) return;
               const statusText = el.textContent.trim();
-              const icon = buildTagTooltipIcon(statusText);
-              if (icon) { el.appendChild(icon); }
+              const tipText = getTagTooltip(statusText);
+              if (tipText) {
+                el.title = tipText;
+                el.style.cursor = 'help';
+              }
             });
           }
           window.TAG_TOOLTIP_TEXT   = TAG_TOOLTIP_TEXT;
@@ -2677,7 +2682,6 @@
                 <button id="d4-export-btn" class="d4-export-btn" aria-label="Download tool data as CSV">
                   <span class="d4-export-icon">&#8595;</span> Download Tool Data
                 </button>
-                <span class="d4-export-help" id="d4-help-text">${countLabel} &middot; 15 fields</span>
               </div>
             `;
             const btn = document.getElementById('d4-export-btn');
