@@ -2564,7 +2564,9 @@
           function buildCSV() {
             const data = window.COUNTRY_DATA || {};
             const headers = EXPORT_COLUMNS.map(c => csvEscape(c.header));
-            const rows = [headers.join(',')];
+            // \ufeff = UTF-8 BOM (Excel reads encoding correctly)
+            // sep=, line tells Excel explicitly which delimiter to use (works in all locales)
+            const rows = ['\ufeffsep=,', headers.join(',')];
             Object.entries(data).sort(([a], [b]) => a.localeCompare(b)).forEach(([countryName, countryObj]) => {
               const row = EXPORT_COLUMNS.map(col => col.key === 'country_name' ? csvEscape(countryName) : csvEscape(countryObj[col.key]));
               rows.push(row.join(','));
@@ -2576,7 +2578,7 @@
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
           }
           function triggerDownload(csvString, filename) {
-            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8-sig;' });
             const url  = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url; link.download = filename; link.style.display = 'none';
