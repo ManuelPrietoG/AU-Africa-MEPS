@@ -406,7 +406,7 @@
 .d1-suggestion-item:hover, .d1-suggestion-item.d1-suggestion-active { background: #f0fdf4; color: var(--heat-green-600, #00953c); }
 
         /* D4 — Export CSV Button */
-.d4-export-bar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; flex-wrap: wrap; }
+.d4-export-bar { display: flex; align-items: center; gap: 10px; padding: 0; flex-wrap: wrap; }
 .d4-export-btn {
   display: inline-flex;
   align-items: center;
@@ -562,7 +562,7 @@
                 </a>
                 <div class="text-xs text-white/40 uppercase mt-6 mb-2 px-3">Appliances</div>
                 <a href="#" onclick="setView('rac')" id="nav-rac" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
-                    <i class="fa-solid fa-snowflake w-5"></i> Cooling (RAC)
+                    <i class="fa-solid fa-snowflake w-5"></i> Air Conditioners
                 </a>
                 <a href="#" onclick="setView('refrigeration')" id="nav-refrigeration" class="nav-link block px-3 py-2 rounded text-sm hover:bg-white/10">
                     <i class="fa-solid fa-box-archive w-5"></i> Refrigeration
@@ -589,7 +589,7 @@
             </nav>
             <!-- Footer -->
             <div class="p-4 border-t border-white/10 text-xs text-white/40">
-                <p>HEAT GmbH &copy; 2024</p>
+                <p>HEAT GmbH &copy; 2026</p>
             </div>
         </aside>
 
@@ -642,7 +642,7 @@
             <div id="tooltip" style="position: fixed; background: var(--heat-blue-800); color: white; padding: 10px 14px; border-radius: 6px; font-size: 12px; pointer-events: none; opacity: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
 
             <!-- Country Detail Panel -->
-            <div id="country-panel" class="hidden fixed right-8 top-24 w-80 bg-white rounded-lg shadow-xl border z-50" style="border-color: var(--heat-line);">
+            <div id="country-panel" class="hidden fixed right-8 top-24 bg-white rounded-lg shadow-xl border z-50" style="border-color: var(--heat-line); width: 360px;">
                 <div class="p-4 border-b flex justify-between items-center" style="background: var(--heat-blue-800); border-radius: 8px 8px 0 0;">
                     <h3 id="panel-country-name" class="font-bold text-white text-lg"></h3>
                     <button onclick="closePanel()" class="text-white/60 hover:text-white text-xl">&times;</button>
@@ -2305,8 +2305,8 @@
               // Use view-specific appliance status when on a sub-page
               const s = (typeof window.getStatus === 'function' ? window.getStatus(name) : d.status || '').toLowerCase();
               if (s.includes('mandatory')) counts.mandatory++;
-              else if (s.includes('harmonized') || s.includes('harmonised') || s.includes('directive')) counts.regional++;
-              else if (s.includes('development')) counts.dev++;
+              else if (s.includes('harmonized') || s.includes('harmonised')) counts.regional++;
+              else if (s.includes('directive') || s.includes('development')) counts.dev++;
               else counts.none++;
             });
             const safe = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -2684,6 +2684,7 @@
                 </button>
               </div>
             `;
+            container.style.marginTop = '14px';
             const btn = document.getElementById('d4-export-btn');
             if (btn) { btn.addEventListener('click', handleExportClick); }
           }
