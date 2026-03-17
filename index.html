@@ -196,6 +196,7 @@
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 6px 10px;
+  width: 100%;
   gap: 6px;
   flex: 1 1 200px;
   min-width: 160px;
@@ -397,6 +398,13 @@
 .d3-verified-value { color: #6b7280; white-space: nowrap; }
 .d3-outdated-warning { display: flex; align-items: flex-start; gap: 6px; background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #92400e; margin-bottom: 8px; line-height: 1.4; }
 
+        /* D1 — Search Autocomplete Suggestions */
+.d1-search-outer { position: relative; flex: 1 1 200px; min-width: 160px; max-width: 320px; }
+.d1-suggestions { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: white; border: 1.5px solid var(--heat-green, #62d32f); border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: none; }
+.d1-suggestion-item { padding: 8px 14px; font-size: 13px; cursor: pointer; color: #374151; border-bottom: 1px solid #f3f4f6; }
+.d1-suggestion-item:last-child { border-bottom: none; }
+.d1-suggestion-item:hover, .d1-suggestion-item.d1-suggestion-active { background: #f0fdf4; color: var(--heat-green-600, #00953c); }
+
         /* D4 — Export CSV Button */
 .d4-export-bar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; flex-wrap: wrap; }
 .d4-export-btn {
@@ -587,7 +595,11 @@
 
         <!-- Main -->
         <main class="flex-1 p-8 overflow-auto">
-            <h2 id="title" class="text-2xl font-bold heat-heading mb-6">Regional Overview</h2>
+            <!-- Title row + Download Tool Data button -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="title" class="text-2xl font-bold heat-heading">Regional Overview</h2>
+                <div id="d4-export-btn-container"></div>
+            </div>
 
             <!-- Stats -->
             <div class="grid grid-cols-4 gap-4 mb-6">
@@ -611,9 +623,6 @@
 
             <!-- D1: Search + Filter Bar -->
             <div id="d1-search-bar-container"></div>
-
-            <!-- D4: Export CSV Button -->
-            <div id="d4-export-btn-container"></div>
 
             <!-- Map -->
             <div class="bg-white rounded-lg shadow-sm border p-4" style="border-color: var(--heat-line);">
@@ -2230,10 +2239,13 @@
             if (!container) { console.warn('D1: #d1-search-bar-container not found'); return; }
             container.innerHTML = `
               <div class="d1-search-bar" role="search" aria-label="Country search and regional filter">
-                <div class="d1-search-input-wrapper">
-                  <span class="d1-search-icon" aria-hidden="true">&#128269;</span>
-                  <input id="d1-country-search" type="text" placeholder="Search country…" autocomplete="off" aria-label="Search country by name" class="d1-input" />
-                  <button id="d1-clear-search" class="d1-clear-btn" aria-label="Clear search" title="Clear search" style="display:none;">&#10005;</button>
+                <div class="d1-search-outer">
+                  <div class="d1-search-input-wrapper">
+                    <span class="d1-search-icon" aria-hidden="true">&#128269;</span>
+                    <input id="d1-country-search" type="text" placeholder="Search country…" autocomplete="off" aria-label="Search country by name" class="d1-input" />
+                    <button id="d1-clear-search" class="d1-clear-btn" aria-label="Clear search" title="Clear search" style="display:none;">&#10005;</button>
+                  </div>
+                  <div class="d1-suggestions" id="d1-suggestions" role="listbox" aria-label="Country suggestions"></div>
                 </div>
                 <div class="d1-region-filters" role="group" aria-label="Filter by regional bloc">
                   <button class="d1-region-btn d1-region-btn--active" data-region="ALL"   aria-pressed="true">All Africa</button>
@@ -2313,6 +2325,34 @@
               window.showCountryPanel(visible[0]);
             }
           }
+          function hideSuggestions() {
+            const s = document.getElementById('d1-suggestions');
+            if (s) s.style.display = 'none';
+          }
+          function showSuggestions(term) {
+            const box = document.getElementById('d1-suggestions');
+            if (!box) return;
+            if (!term) { hideSuggestions(); return; }
+            const all = Object.keys(window.COUNTRY_DATA || {});
+            const matches = all.filter(n => n.toLowerCase().includes(term.toLowerCase())).slice(0, 10);
+            if (matches.length === 0) { hideSuggestions(); return; }
+            box.innerHTML = matches.map(n =>
+              `<div class="d1-suggestion-item" role="option" tabindex="-1">${n}</div>`
+            ).join('');
+            box.style.display = 'block';
+            box.querySelectorAll('.d1-suggestion-item').forEach(item => {
+              item.addEventListener('mousedown', function (e) {
+                e.preventDefault(); // prevent blur firing before click
+                const inp = document.getElementById('d1-country-search');
+                if (inp) inp.value = this.textContent;
+                searchTerm = this.textContent;
+                hideSuggestions();
+                const clr = document.getElementById('d1-clear-search');
+                if (clr) clr.style.display = 'inline-flex';
+                applyFilters();
+              });
+            });
+          }
           function attachListeners() {
             const searchInput = document.getElementById('d1-country-search');
             const clearBtn    = document.getElementById('d1-clear-search');
@@ -2320,10 +2360,15 @@
               searchInput.addEventListener('input', function () {
                 searchTerm = this.value.trim();
                 clearBtn.style.display = searchTerm ? 'inline-flex' : 'none';
+                showSuggestions(searchTerm);
                 applyFilters();
               });
               searchInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') { this.value = ''; searchTerm = ''; clearBtn.style.display = 'none'; applyFilters(); }
+                if (e.key === 'Escape') { this.value = ''; searchTerm = ''; clearBtn.style.display = 'none'; hideSuggestions(); applyFilters(); }
+              });
+              searchInput.addEventListener('blur', function () {
+                // small delay so mousedown on suggestion fires first
+                setTimeout(hideSuggestions, 150);
               });
             }
             if (clearBtn) {
@@ -2332,6 +2377,7 @@
                 if (inp) inp.value = '';
                 searchTerm = '';
                 this.style.display = 'none';
+                hideSuggestions();
                 applyFilters();
               });
             }
@@ -2357,6 +2403,7 @@
             applyFilters();
           };
           window.D1_refreshMap = function () { applyFilters(); };
+          window.D1_getVisibleCountries = getVisibleCountries;
           function init() {
             injectSearchBar();
             attachListeners();
@@ -2555,22 +2602,37 @@
             { header: 'Lighting Status',          key: 'lighting' },
             { header: 'Motors Status',            key: 'motors' }
           ];
+          // Columns that hold decimal numbers — use comma as decimal separator for European Excel
+          const NUMERIC_KEYS = new Set(['rac_cspf_min','rac_cspf_target','refrigeration_eei_max','lighting_efficacy_min','electricity_tariff','grid_emission_factor']);
           function csvEscape(val) {
             if (val === null || val === undefined) return '';
             const str = String(val);
-            if (str.includes(',') || str.includes('"') || str.includes('\n')) { return '"' + str.replace(/"/g, '""') + '"'; }
+            // Wrap in quotes if contains semicolon, double-quote or newline
+            if (str.includes(';') || str.includes('"') || str.includes('\n')) { return '"' + str.replace(/"/g, '""') + '"'; }
             return str;
+          }
+          function csvEscapeNumeric(val) {
+            if (val === null || val === undefined) return '';
+            // Replace decimal dot with comma so European Excel parses as number, not date/text
+            return String(val).replace('.', ',');
           }
           function buildCSV() {
             const data = window.COUNTRY_DATA || {};
+            // Export only currently visible (filtered) countries
+            const visibleSet = new Set(window.D1_getVisibleCountries ? window.D1_getVisibleCountries() : Object.keys(data));
             const headers = EXPORT_COLUMNS.map(c => csvEscape(c.header));
-            // \ufeff = UTF-8 BOM (Excel reads encoding correctly)
-            // sep=, line tells Excel explicitly which delimiter to use (works in all locales)
-            const rows = ['\ufeffsep=,', headers.join(',')];
-            Object.entries(data).sort(([a], [b]) => a.localeCompare(b)).forEach(([countryName, countryObj]) => {
-              const row = EXPORT_COLUMNS.map(col => col.key === 'country_name' ? csvEscape(countryName) : csvEscape(countryObj[col.key]));
-              rows.push(row.join(','));
-            });
+            // BOM + sep=; tells European Excel to use semicolon as delimiter
+            const rows = ['\ufeffsep=;', headers.join(';')];
+            Object.entries(data)
+              .filter(([name]) => visibleSet.has(name))
+              .sort(([a], [b]) => a.localeCompare(b))
+              .forEach(([countryName, countryObj]) => {
+                const row = EXPORT_COLUMNS.map(col => {
+                  if (col.key === 'country_name') return csvEscape(countryName);
+                  return NUMERIC_KEYS.has(col.key) ? csvEscapeNumeric(countryObj[col.key]) : csvEscape(countryObj[col.key]);
+                });
+                rows.push(row.join(';'));
+              });
             return rows.join('\r\n');
           }
           function getTodayString() {
@@ -2607,12 +2669,15 @@
               }
             }
             if (!container) { console.warn('D4: Could not find container for export button.'); return; }
+            const total = Object.keys(window.COUNTRY_DATA || {}).length;
+            const visible = window.D1_getVisibleCountries ? window.D1_getVisibleCountries().length : total;
+            const countLabel = visible === total ? `${total} countries` : `${visible} of ${total} countries`;
             container.innerHTML = `
               <div class="d4-export-bar">
-                <button id="d4-export-btn" class="d4-export-btn" aria-label="Download all country MEPS data as CSV">
-                  <span class="d4-export-icon">&#8595;</span> Download CSV
+                <button id="d4-export-btn" class="d4-export-btn" aria-label="Download tool data as CSV">
+                  <span class="d4-export-icon">&#8595;</span> Download Tool Data
                 </button>
-                <span class="d4-export-help">All ${Object.keys(window.COUNTRY_DATA || {}).length} countries &middot; 15 fields</span>
+                <span class="d4-export-help" id="d4-help-text">${countLabel} &middot; 15 fields</span>
               </div>
             `;
             const btn = document.getElementById('d4-export-btn');
