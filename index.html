@@ -1456,6 +1456,7 @@
             ECOWAS: ["Benin", "Burkina Faso", "Cape Verde", "Cote d'Ivoire", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Liberia", "Mali", "Niger", "Nigeria", "Senegal", "Sierra Leone", "Togo"],
             EAC: ["Burundi", "Kenya", "Rwanda", "South Sudan", "Tanzania", "Uganda", "Democratic Republic of the Congo", "Somalia"]
         };
+        window.REGIONS = REGIONS; // expose to D1 module (const ≠ window property)
 
         const REGION_STYLES = {
             SADC: { color: HEAT.blue600, dash: '8,4', width: 4 },
@@ -1999,6 +2000,7 @@
         async function initMap() {
             const supabaseData = await fetchCountryData();
             COUNTRY_DATA = supabaseData || EMBEDDED_DATA;
+            window.COUNTRY_DATA = COUNTRY_DATA; // expose to D1 module (let ≠ window property)
             console.log(`[E4] Using ${supabaseData ? 'Supabase' : 'embedded'} data (${Object.keys(COUNTRY_DATA).length} countries)`);
 
             if (supabaseData) {
