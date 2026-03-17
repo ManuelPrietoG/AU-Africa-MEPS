@@ -2011,6 +2011,10 @@
         async function initMap() {
             const supabaseData = await fetchCountryData();
             COUNTRY_DATA = supabaseData || EMBEDDED_DATA;
+            // Always inject non-sovereign / disputed entries that are not in Supabase
+            if (!COUNTRY_DATA['Western Sahara']) {
+                COUNTRY_DATA['Western Sahara'] = EMBEDDED_DATA['Western Sahara'];
+            }
             window.COUNTRY_DATA = COUNTRY_DATA; // expose to D1 module (let ≠ window property)
             console.log(`[E4] Using ${supabaseData ? 'Supabase' : 'embedded'} data (${Object.keys(COUNTRY_DATA).length} countries)`);
 
