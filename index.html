@@ -2279,7 +2279,10 @@
             if (svgEl.empty()) return;
             svgEl.selectAll('path').each(function (d) {
               if (!d || !d.properties) return;
-              const name = d.properties.name;
+              const rawName = d.properties.name;
+              if (!rawName) return; // skip region boundary paths (no name property)
+              // normalise GeoJSON name to match COUNTRY_DATA keys
+              const name = (typeof window.normaliseGeoName === 'function') ? window.normaliseGeoName(rawName) : rawName;
               const pathEl = d3.select(this);
               const inVisible = visibleSet.has(name);
               if (inVisible) {
