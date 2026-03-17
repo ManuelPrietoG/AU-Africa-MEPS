@@ -428,7 +428,7 @@
 .d4-export-help { font-size: 11px; color: #9ca3af; }
 
         /* D5 — Implementation Timeline */
-#section-timeline { padding: 24px 20px; }
+#section-timeline { padding: 0; }
 #section-timeline h2 { font-size: 18px; font-weight: 700; color: var(--heat-blue-800, #003e51); margin: 0 0 6px; }
 #section-timeline .d5-section-subtitle { font-size: 13px; color: #6b7280; margin: 0 0 20px; }
 #d5-timeline-container {
@@ -466,7 +466,7 @@
 .d5-tt-row { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
 .d5-tt-detail { margin-top: 8px; font-size: 11.5px; color: #4b5563; border-top: 1px solid #f3f4f6; padding-top: 8px; line-height: 1.6; }
 @media (max-width: 768px) {
-  #section-timeline { padding: 16px 12px; }
+  #section-timeline { padding: 0; }
   .d5-tooltip { max-width: 240px; font-size: 11px; }
 }
 
@@ -2325,7 +2325,7 @@
                       .attr('opacity', 1).attr('stroke', '#fff').attr('stroke-width', 0.5)
                       .style('pointer-events', null);
               } else {
-                pathEl.attr('fill', '#e2e8f0').attr('opacity', 0.35).attr('stroke', '#cbd5e1').attr('stroke-width', 0.3)
+                pathEl.attr('fill', '#cbd5e1').attr('opacity', 0.65).attr('stroke', '#b0b8c4').attr('stroke-width', 0.4)
                       .style('pointer-events', 'none');
               }
             });
@@ -2737,30 +2737,44 @@
           const TODAY = new Date();
           function isPast(dateStr) { return new Date(dateStr) <= TODAY; }
           const TIMELINE_EVENTS = [
-            { id: 'sadc_ht110_approved', row: 'SADC', date: '2024-02-01', label: 'SADC HT 110:2023\napproved', detail: 'SADC HT 110:2023 (AC CSPF ≥ 4.5) formally approved by SADC Secretariat, Gaborone. Applies to split-type non-ducted AC ≤14 kW. CSPF measured per ISO 16358-1:2013.', value: 'CSPF 4.5', shape: 'diamond' },
-            { id: 'sadc_ht111_approved', row: 'SADC', date: '2024-02-01', label: 'SADC HT 111:2023\napproved', detail: 'SADC HT 111:2023 (Refrigerator EEI ≤ 120) formally approved. Applies to household refrigerators and freezers ≤ 500 L. Testing per IEC 62552-3.', value: 'EEI 120', shape: 'circle', offsetY: 20 },
-            { id: 'mauritius_enforcement', row: 'SADC', date: '2025-09-01', label: 'Mauritius CSPF 4.5\nenforcing', detail: 'Mauritius becomes first SADC member to begin active enforcement of CSPF 4.5 standard. Import controls at border, market surveillance sampling active. Enforcement level: L1.', value: 'CSPF 4.5 enforced', shape: 'diamond' },
-            { id: 'sadc_phase2_target', row: 'SADC', date: '2027-01-01', label: 'SADC Phase 2\nCSPF 6.1 target', detail: 'SADC HT 110 Phase 2 tightening target: CSPF ≥ 6.1. Announced as future target — exact gazette date to be confirmed by SADC Secretariat. Confidence: reported.', value: 'CSPF 6.1', shape: 'diamond' },
-            { id: 'eac_eas1213_gazetted', row: 'EAC', date: '2025-07-01', label: 'EAC EAS 1213:2025\ngazetted (AC)', detail: 'EAC EAS 1213:2025 gazetted July 2025 by EAC Standards Committee. Phase 1: CSPF ≈ 4.5 for split-type non-ducted AC. Applies to 6 EAC partner states. Jan 2026: partner state adoption deadline.', value: 'CSPF ≈ 4.5', shape: 'diamond' },
-            { id: 'eac_eas1212_gazetted', row: 'EAC', date: '2025-07-01', label: 'EAC EAS 1212:2025\ngazetted (Ref.)', detail: 'EAC EAS 1212:2025 gazetted July 2025. Phase 1 refrigerator EEI threshold ≈ 120 (aligned with SADC HT 111:2023). Verification against official EAC gazette document pending.', value: 'EEI ≈ 120', shape: 'circle', offsetY: 20 },
-            { id: 'eac_adoption_deadline', row: 'EAC', date: '2026-01-01', label: 'EAC partner state\nadoption deadline', detail: 'Deadline for all EAC partner states (Kenya, Rwanda, Tanzania, Uganda, Burundi, South Sudan, Somalia) to individually adopt EAS 1213:2025 and EAS 1212:2025 into national law.', value: 'Regional harmonisation', shape: 'circle' },
-            { id: 'eac_phase2', row: 'EAC', date: '2027-01-01', label: 'EAC Phase 2\nCSPF 6.1 target', detail: 'EAC EAS 1213 Phase 2 tightening: CSPF target ≈ 6.1. Aligned with SADC Phase 2. Exact effective date subject to EAC member state review.', value: 'CSPF 6.1', shape: 'diamond' },
-            { id: 'ghana_meps_li2458', row: 'ECOWAS', date: '2020-01-01', label: 'Ghana LI 2458\nAC MEPS enacted', detail: 'Ghana Legislative Instrument 2458 enacted. AC MEPS: EER ≥ 2.8 (CSPF equiv. ≈ 3.0). Also covers refrigerators and lighting.', value: 'EER 2.8 (CSPF ≈ 3.0)', shape: 'circle' },
-            { id: 'ghana_enforcement', row: 'ECOWAS', date: '2025-12-01', label: 'Ghana enforcement\nintensifies', detail: 'Ghana Energy Commission intensifies enforcement of LI 2458. Market seizures of non-compliant AC units begin. ECOWAS member using national standard rather than awaiting directive transposition.', value: 'National enforcement', shape: 'diamond' },
-            { id: 'nigeria_nseer_workshop', row: 'ECOWAS', date: '2025-06-01', label: 'Nigeria NSEER\ncapacity workshop', detail: 'Nigeria Standards Organisation (SON) holds compliance support workshop for NSEER (National Seasonal Energy Efficiency Rating). Climate bins: hot-humid ≥ 3.3, hot-dry ≥ 2.8, mixed ≥ 3.0. Metric diverges from ECOWAS CSPF directive.', value: 'NSEER baseline', shape: 'circle' },
-            { id: 'ecowas_regional_tier1', row: 'ECOWAS', date: '2030-01-01', label: 'ECOWAS\nTier 1 target', detail: 'ECOWAS regional AC MEPS Tier 1 target: CSPF ≈ 4.5. Projected based on ECOWAS energy efficiency programme roadmap. Confirmation from ECOWAS Energy and Mines Directorate pending.', value: 'CSPF ≈ 4.5 (projected)', shape: 'diamond' },
-            { id: 'southafrica_sans941', row: 'National', date: '2020-01-01', label: 'South Africa\nSANS 941 CSPF 3.0', detail: 'South Africa SANS 941 sets CSPF 3.0 minimum for AC. First SADC member to have a national standard. Currently domesticating SADC HT 110:2023 Phase 1 (CSPF 4.5).', value: 'CSPF 3.0', shape: 'circle' },
-            { id: 'kenya_eac_ph1', row: 'National', date: '2025-07-01', label: 'Kenya adopts\nEAC Phase 1', detail: 'Kenya, founding EAC member, adopts EAS 1213:2025 Phase 1. Previous national standard: CSPF 3.1. Phase 2 (CSPF 6.1) represents a ~97% improvement by 2027.', value: 'CSPF 3.1 → 4.5', shape: 'diamond' },
-            { id: 'sadc_eac_tier2', row: 'National', date: '2027-01-01', label: 'SADC/EAC Tier 2\nCSPF 6.1 all members', detail: 'SADC and EAC aligned Phase 2 tightening target. All member states expected to enforce CSPF ≥ 6.1. This is the most significant MEPS escalation in African history — +36% above Phase 1.', value: 'CSPF 6.1 (regional)', shape: 'diamond' }
+            // AC / Air Conditioners
+            { id: 'sadc_ht110_approved',  row: 'SADC',     date: '2024-02-01', label: 'HT 110\nCSPF 4.5',      appliance: 'ac',           detail: 'SADC HT 110:2023 (AC CSPF ≥ 4.5) formally approved by SADC Secretariat, Gaborone. Applies to split-type non-ducted AC ≤14 kW.', value: 'CSPF 4.5', shape: 'diamond' },
+            { id: 'mauritius_enforcement', row: 'SADC',    date: '2025-09-01', label: 'Mauritius\nCSPF 4.5',    appliance: 'ac',           detail: 'Mauritius becomes first SADC member to begin active enforcement of CSPF 4.5 standard. Import controls at border.', value: 'CSPF 4.5 enforced', shape: 'diamond' },
+            { id: 'sadc_phase2_ac',        row: 'SADC',    date: '2027-01-01', label: 'Phase 2\nCSPF 6.1',     appliance: 'ac',           detail: 'SADC HT 110 Phase 2 tightening target: CSPF ≥ 6.1.', value: 'CSPF 6.1', shape: 'diamond' },
+            { id: 'eac_eas1213_gazetted',  row: 'EAC',     date: '2025-07-01', label: 'EAS 1213\nCSPF 4.5',   appliance: 'ac',           detail: 'EAC EAS 1213:2025 gazetted July 2025. Phase 1: CSPF ≈ 4.5 for split-type non-ducted AC. Applies to 6 EAC partner states.', value: 'CSPF ≈ 4.5', shape: 'diamond' },
+            { id: 'eac_adoption_deadline', row: 'EAC',     date: '2026-01-01', label: 'Adoption\ndeadline',    appliance: 'ac',           detail: 'Deadline for all EAC partner states to adopt EAS 1213:2025 and EAS 1212:2025 into national law.', value: 'Regional', shape: 'circle' },
+            { id: 'eac_phase2_ac',         row: 'EAC',     date: '2027-01-01', label: 'Phase 2\nCSPF 6.1',    appliance: 'ac',           detail: 'EAC EAS 1213 Phase 2: CSPF target ≈ 6.1. Aligned with SADC Phase 2.', value: 'CSPF 6.1', shape: 'diamond' },
+            { id: 'ghana_meps_li2458',     row: 'ECOWAS',  date: '2020-01-01', label: 'Ghana LI\n2458',        appliance: 'ac',           detail: 'Ghana Legislative Instrument 2458 enacted. AC MEPS: EER ≥ 2.8 (CSPF equiv. ≈ 3.0). Also covers refrigerators and lighting.', value: 'EER 2.8', shape: 'circle' },
+            { id: 'ghana_enforcement',     row: 'ECOWAS',  date: '2025-12-01', label: 'Ghana\nenforcement',   appliance: 'ac',           detail: 'Ghana Energy Commission intensifies enforcement of LI 2458. Market seizures of non-compliant AC units begin.', value: 'National enforcement', shape: 'diamond' },
+            { id: 'nigeria_nseer',         row: 'ECOWAS',  date: '2025-06-01', label: 'Nigeria\nNSEER',        appliance: 'ac',           detail: 'Nigeria SON holds NSEER compliance workshop. Metric diverges from ECOWAS CSPF directive.', value: 'NSEER baseline', shape: 'circle' },
+            { id: 'ecowas_tier1_ac',       row: 'ECOWAS',  date: '2030-01-01', label: 'ECOWAS\nTier 1',        appliance: 'ac',           detail: 'ECOWAS regional AC MEPS Tier 1 target: CSPF ≈ 4.5 (projected).', value: 'CSPF ≈ 4.5', shape: 'diamond' },
+            { id: 'southafrica_sans941',   row: 'National', date: '2020-01-01', label: 'SA SANS 941\nCSPF 3.0', appliance: 'ac',          detail: 'South Africa SANS 941 sets CSPF 3.0 minimum. First SADC member with a national AC standard.', value: 'CSPF 3.0', shape: 'circle' },
+            { id: 'kenya_eac_ph1',         row: 'National', date: '2025-07-01', label: 'Kenya\nEAC Ph.1',      appliance: 'ac',           detail: 'Kenya adopts EAS 1213:2025 Phase 1. Previous standard: CSPF 3.1.', value: 'CSPF 3.1 → 4.5', shape: 'diamond' },
+            { id: 'sadc_eac_tier2_ac',     row: 'National', date: '2027-01-01', label: 'SADC/EAC\nCSPF 6.1',  appliance: 'ac',           detail: 'SADC and EAC aligned Phase 2 target. All members enforce CSPF ≥ 6.1.', value: 'CSPF 6.1', shape: 'diamond' },
+            // Refrigerators
+            { id: 'sadc_ht111_approved',   row: 'SADC',    date: '2024-02-01', label: 'HT 111\nEEI 120',      appliance: 'refrigerators', detail: 'SADC HT 111:2023 (Refrigerator EEI ≤ 120) formally approved. Applies to household refrigerators ≤ 500 L.', value: 'EEI 120', shape: 'diamond' },
+            { id: 'sadc_phase2_ref',       row: 'SADC',    date: '2028-01-01', label: 'Phase 2\nEEI target',  appliance: 'refrigerators', detail: 'SADC HT 111 Phase 2 tightening target (indicative). Exact threshold under review.', value: 'EEI <100 (projected)', shape: 'diamond' },
+            { id: 'eac_eas1212_gazetted',  row: 'EAC',     date: '2025-07-01', label: 'EAS 1212\nEEI 120',    appliance: 'refrigerators', detail: 'EAC EAS 1212:2025 gazetted July 2025. Phase 1 refrigerator EEI threshold ≈ 120, aligned with SADC HT 111:2023.', value: 'EEI ≈ 120', shape: 'diamond' },
+            { id: 'ecowas_ref_directive',  row: 'ECOWAS',  date: '2018-01-01', label: 'ECOWAS\nRef. directive', appliance: 'refrigerators', detail: 'ECOWAS Energy Efficiency Directive for refrigerators: EEI ≤ 140 target for member states.', value: 'EEI ≤ 140', shape: 'circle' },
+            // Lighting
+            { id: 'ecowas_lighting_dir',   row: 'ECOWAS',  date: '2016-06-01', label: 'ECOWAS\nLED directive', appliance: 'lighting',     detail: 'ECOWAS issues LED lighting efficiency directive. Target: ≥ 70 lm/W for LED lamps across member states.', value: '70 lm/W', shape: 'circle' },
+            { id: 'kenya_lighting',        row: 'National', date: '2023-01-01', label: 'Kenya\nLED MEPS',     appliance: 'lighting',      detail: 'Kenya Energy and Petroleum Regulatory Authority enforces LED lamp MEPS: minimum 80 lm/W for residential lamps.', value: '80 lm/W', shape: 'diamond' },
+            { id: 'sadc_lighting_wg',      row: 'SADC',    date: '2026-06-01', label: 'SADC lighting\nWG target', appliance: 'lighting',  detail: 'SADC working group target for harmonized lighting standard. Minimum 80 lm/W LED lamp efficacy across member states.', value: '80 lm/W target', shape: 'diamond' },
+            // Electric Motors
+            { id: 'sa_motors_ie3',         row: 'National', date: '2019-01-01', label: 'SA IE3\nmandatory',   appliance: 'motors',        detail: 'South Africa mandates IE3 (SANS 60034-30-1) for motors 0.75–375 kW. First African country with mandatory motor MEPS.', value: 'IE3', shape: 'diamond' },
+            { id: 'senegal_ie3',           row: 'National', date: '2024-01-01', label: 'Senegal\nIE3 MEPS',   appliance: 'motors',        detail: 'Senegal adopts IE3 motor efficiency standard, aligned with ECOWAS programme targets.', value: 'IE3', shape: 'diamond' },
+            { id: 'ecowas_motors_prog',    row: 'ECOWAS',  date: '2022-01-01', label: 'ECOWAS\nmotor IE2',    appliance: 'motors',        detail: 'ECOWAS Energy Efficiency Programme sets IE2 minimum for motors as regional target for member states.', value: 'IE2 minimum', shape: 'circle' },
+            { id: 'sadc_motors_target',    row: 'SADC',    date: '2027-01-01', label: 'SADC IE3\ntarget',     appliance: 'motors',        detail: 'SADC harmonized motor MEPS target: IE3 for motors 0.75–375 kW. Aligned with IEC 60034-30-1:2014 efficiency classes.', value: 'IE3 target', shape: 'diamond' },
           ];
           const CONFIG = {
             yearStart: 2010, yearEnd: 2035,
             rows: ['SADC', 'EAC', 'ECOWAS', 'National'],
-            rowHeight: 130, marginTop: 40, marginBottom: 60, marginLeft: 90, marginRight: 40,
+            rowHeight: 130, marginTop: 40, marginBottom: 70, marginLeft: 90, marginRight: 40,
             dotRadius: 7, diamondSize: 9,
             colorCompleted: '#62D32F', colorUpcoming: '#FF5721', colorToday: '#003E51',
             colorGrid: '#e5e7eb', colorRowBg: ['#f9fafb', '#ffffff']
           };
+          let _activeAppliance = 'all';
           let _rendered = false;
           function render() {
             const container = document.getElementById('d5-timeline-container');
@@ -2768,6 +2782,35 @@
             if (_rendered) return;
             _rendered = true;
             container.innerHTML = '';
+
+            // Appliance filter bar
+            const filterBar = document.createElement('div');
+            filterBar.id = 'd5-filter-bar';
+            filterBar.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;';
+            const appliances = [
+              { key: 'all',          label: 'All appliances' },
+              { key: 'ac',           label: '❄ Air Conditioners' },
+              { key: 'refrigerators',label: '🧊 Refrigerators' },
+              { key: 'lighting',     label: '💡 Lighting' },
+              { key: 'motors',       label: '⚙ Motors' }
+            ];
+            appliances.forEach(ap => {
+              const btn = document.createElement('button');
+              btn.textContent = ap.label;
+              btn.dataset.appliance = ap.key;
+              const isActive = _activeAppliance === ap.key;
+              btn.style.cssText = `font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid ${isActive ? '#003e51' : '#d1d5db'};background:${isActive ? '#003e51' : '#fff'};color:${isActive ? '#fff' : '#374151'};cursor:pointer;font-family:inherit;`;
+              btn.addEventListener('click', () => {
+                _activeAppliance = ap.key;
+                _rendered = false;
+                container.innerHTML = '';
+                render();
+              });
+              filterBar.appendChild(btn);
+            });
+            container.appendChild(filterBar);
+
+            const activeEvents = _activeAppliance === 'all' ? TIMELINE_EVENTS : TIMELINE_EVENTS.filter(e => e.appliance === _activeAppliance);
             const rect = container.getBoundingClientRect();
             const containerWidth = (rect.width > 100 ? rect.width : container.offsetWidth) || 900;
             const width = containerWidth;
@@ -2828,7 +2871,7 @@
             // Pre-compute label sides (above/below) to avoid overlap
             const labelSide = {}; // ev.id -> true=above, false=below
             const rowEventsSorted = {};
-            TIMELINE_EVENTS.forEach(ev => {
+            activeEvents.forEach(ev => {
               if (!rowEventsSorted[ev.row]) rowEventsSorted[ev.row] = [];
               rowEventsSorted[ev.row].push({ ...ev, _cx: xScale(new Date(ev.date)) });
             });
@@ -2846,7 +2889,7 @@
               }
             });
 
-            TIMELINE_EVENTS.forEach(ev => {
+            activeEvents.forEach(ev => {
               const rowBand = yScale(ev.row);
               if (rowBand === undefined) return;
               const cx = xScale(new Date(ev.date));
@@ -2875,20 +2918,27 @@
               labelLines.forEach((line, i) => { textEl.append('tspan').attr('x', cx).attr('dy', i === 0 ? 0 : `${lineH}px`).text(line); });
               evGroup.on('mouseenter', (event, _d) => showTooltip(event, ev)).on('mousemove', (event) => positionTooltip(event)).on('mouseleave', () => hideTooltip());
             });
-            const legendData = [
-              { color: CONFIG.colorCompleted, label: 'Completed milestone' },
-              { color: CONFIG.colorUpcoming,  label: 'Upcoming / target' },
-              { color: CONFIG.colorToday,     label: 'Today', dashed: true }
+            const legendItems = [
+              { type: 'circle',  color: CONFIG.colorCompleted, label: 'Completed (enforcement / national)' },
+              { type: 'diamond', color: CONFIG.colorCompleted, label: 'Completed (regional standard)' },
+              { type: 'circle',  color: CONFIG.colorUpcoming,  label: 'Upcoming (enforcement / national)' },
+              { type: 'diamond', color: CONFIG.colorUpcoming,  label: 'Upcoming target' },
+              { type: 'dashed',  color: CONFIG.colorToday,     label: 'Today' }
             ];
-            const legendG = svg.append('g').attr('transform', `translate(${CONFIG.marginLeft},${height - CONFIG.marginBottom + 22})`);
-            legendData.forEach((item, i) => {
-              const lx = i * 200;
-              if (item.dashed) {
-                legendG.append('line').attr('x1', lx).attr('x2', lx + 20).attr('y1', 6).attr('y2', 6).attr('stroke', item.color).attr('stroke-width', 2).attr('stroke-dasharray', '5,3');
+            const legendG = svg.append('g').attr('transform', `translate(${CONFIG.marginLeft},${height - CONFIG.marginBottom + 18})`);
+            let lx = 0;
+            legendItems.forEach(item => {
+              const iconW = 20, gap = 6, textW = item.label.length * 6.5;
+              if (item.type === 'dashed') {
+                legendG.append('line').attr('x1', lx).attr('x2', lx + iconW).attr('y1', 7).attr('y2', 7).attr('stroke', item.color).attr('stroke-width', 2).attr('stroke-dasharray', '5,3');
+              } else if (item.type === 'diamond') {
+                const s = 6;
+                legendG.append('rect').attr('x', lx + 10 - s).attr('y', 7 - s).attr('width', s * 2).attr('height', s * 2).attr('transform', `rotate(45,${lx + 10},7)`).attr('fill', item.color);
               } else {
-                legendG.append('circle').attr('cx', lx + 10).attr('cy', 6).attr('r', 6).attr('fill', item.color);
+                legendG.append('circle').attr('cx', lx + 10).attr('cy', 7).attr('r', 6).attr('fill', item.color);
               }
-              legendG.append('text').attr('x', lx + 26).attr('y', 10).attr('font-size', '11px').attr('fill', '#6b7280').text(item.label);
+              legendG.append('text').attr('x', lx + iconW + gap).attr('y', 11).attr('font-size', '10px').attr('fill', '#6b7280').text(item.label);
+              lx += iconW + gap + textW + 16;
             });
             console.log('D5: Timeline rendered.');
           }
