@@ -1464,6 +1464,7 @@
 
         // Get color based on status (HEAT palette)
         function getColor(status) {
+            if (!status) return '#cbd5e1';
             if (status.includes('Mandatory')) return HEAT.green600;
             if (status.includes('Harmonized')) return HEAT.blue600;
             if (status.includes('Directive') || status.includes('Development')) return HEAT.orange;
@@ -1475,11 +1476,11 @@
             const data = COUNTRY_DATA[countryName];
             if (!data) return 'None';
             switch(currentView) {
-                case 'motors': return data.motors;
-                case 'rac': return data.rac;
-                case 'lighting': return data.lighting;
-                case 'refrigeration': return data.refrigeration;
-                default: return data.status;
+                case 'motors': return data.motors || 'None';
+                case 'rac': return data.rac || 'None';
+                case 'lighting': return data.lighting || 'None';
+                case 'refrigeration': return data.refrigeration || 'None';
+                default: return data.status || 'None';
             }
         }
 
@@ -1505,7 +1506,10 @@
             svg.selectAll('path.country')
                 .transition()
                 .duration(300)
-                .attr('fill', d => getColor(getStatus(d.properties.name)));
+                .attr('fill', d => {
+                    const name = window.normaliseGeoName ? window.normaliseGeoName(d.properties.name) : d.properties.name;
+                    return getColor(getStatus(name));
+                });
         }
 
         // Get status badge HTML with color
