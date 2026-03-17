@@ -1946,7 +1946,8 @@
                 if (mapSection) mapSection.classList.remove('hidden');
                 updateStats();
                 updateMap();
-                if (window.D1_refreshMap) window.D1_refreshMap();
+                // Delay D1 filter refresh until after the 300ms D3 transition completes
+                setTimeout(function() { if (window.D1_refreshMap) window.D1_refreshMap(); }, 350);
             } else {
                 // Hide map, show content section
                 if (statsSection) statsSection.classList.add('hidden');
@@ -2092,6 +2093,8 @@
                 });
 
                 updateStats();
+                // Sync D1 filter stats now that COUNTRY_DATA is fully loaded
+                if (window.D1_refreshMap) window.D1_refreshMap();
 
             } catch (error) {
                 console.error('[E4] All GeoJSON attempts failed, showing country table fallback:', error);
@@ -2279,9 +2282,12 @@
               const inVisible = visibleSet.has(name);
               if (inVisible) {
                 const status = (typeof window.getStatus === 'function') ? window.getStatus(name) : 'None';
-                pathEl.attr('fill', (typeof window.getColor === 'function') ? window.getColor(status) : '#cbd5e1').attr('opacity', 1).attr('stroke', '#fff').attr('stroke-width', 0.5);
+                pathEl.attr('fill', (typeof window.getColor === 'function') ? window.getColor(status) : '#cbd5e1')
+                      .attr('opacity', 1).attr('stroke', '#fff').attr('stroke-width', 0.5)
+                      .style('pointer-events', null);
               } else {
-                pathEl.attr('fill', '#e2e8f0').attr('opacity', 0.35).attr('stroke', '#cbd5e1').attr('stroke-width', 0.3);
+                pathEl.attr('fill', '#e2e8f0').attr('opacity', 0.35).attr('stroke', '#cbd5e1').attr('stroke-width', 0.3)
+                      .style('pointer-events', 'none');
               }
             });
           }
@@ -2291,7 +2297,8 @@
             visibleCountries.forEach(name => {
               const d = data[name];
               if (!d) return;
-              const s = (d.status || '').toLowerCase();
+              // Use view-specific appliance status when on a sub-page
+              const s = (typeof window.getStatus === 'function' ? window.getStatus(name) : d.status || '').toLowerCase();
               if (s.includes('mandatory')) counts.mandatory++;
               else if (s.includes('harmonized') || s.includes('harmonised') || s.includes('directive')) counts.regional++;
               else if (s.includes('development')) counts.dev++;
