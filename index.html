@@ -603,7 +603,7 @@
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-4 gap-4 mb-6">
+            <div id="dashboard-stats" class="grid grid-cols-4 gap-4 mb-6">
                 <div class="bg-white p-4 rounded-lg shadow-sm border" style="border-color: var(--heat-line);">
                     <div class="text-sm" style="color: var(--heat-text);">Mandatory MEPS</div>
                     <div id="stat-mandatory" class="text-3xl font-bold" style="color: var(--heat-green-600);">0</div>
@@ -623,7 +623,7 @@
             </div>
 
             <!-- Map -->
-            <div class="bg-white rounded-lg shadow-sm border p-4" style="border-color: var(--heat-line);">
+            <div id="map-card" class="bg-white rounded-lg shadow-sm border p-4" style="border-color: var(--heat-line);">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-semibold heat-heading"><i class="fa-solid fa-earth-africa mr-2"></i>Implementation Map</h3>
                     <div class="flex gap-4 text-xs" style="color: var(--heat-text);">
@@ -2003,8 +2003,8 @@
 
             // Show/hide sections based on view
             const mapViews = ['overview', 'motors', 'rac', 'lighting', 'refrigeration'];
-            const statsSection = document.querySelector('.grid.grid-cols-4');
-            const mapSection = document.querySelector('.bg-white.rounded-lg.shadow-sm.border.p-4');
+            const statsSection = document.getElementById('dashboard-stats');
+            const mapSection = document.getElementById('map-card');
             const methodologySection = document.getElementById('section-methodology');
             const sourcesSection = document.getElementById('section-sources');
             const contactsSection = document.getElementById('section-contacts');
@@ -2037,7 +2037,11 @@
                     contactsSection.classList.remove('hidden');
                 } else if (view === 'timeline' && timelineSection) {
                     timelineSection.classList.remove('hidden');
-                    if (window.D5_render) window.D5_render();
+                    // Wait one frame so the container is laid out before measuring width
+                    requestAnimationFrame(function() {
+                        if (window.D5_rerender) window.D5_rerender();
+                        else if (window.D5_render) window.D5_render();
+                    });
                 }
             }
         }
