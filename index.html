@@ -274,16 +274,16 @@
   color: #ffffff;
 }
 .d1-region-btn--active[data-region="SADC"] {
-  background: var(--heat-green-600, #00953c);
-  border-color: var(--heat-green-600, #00953c);
+  background: #B45309;
+  border-color: #B45309;
 }
 .d1-region-btn--active[data-region="ECOWAS"] {
-  background: var(--heat-orange, #ff5721);
-  border-color: var(--heat-orange, #ff5721);
+  background: #7C3AED;
+  border-color: #7C3AED;
 }
 .d1-region-btn--active[data-region="EAC"] {
-  background: var(--heat-blue-600, #005ca8);
-  border-color: var(--heat-blue-600, #005ca8);
+  background: #0891B2;
+  border-color: #0891B2;
 }
 .d1-result-count {
   font-size: 11px;
@@ -956,7 +956,7 @@
                     <!-- SADC -->
                     <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
                         <div class="flex items-center gap-3 mb-4">
-                            <div style="width:48px;height:48px;border-radius:50%;background:#005CA8;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+                            <div style="width:48px;height:48px;border-radius:50%;background:#B45309;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
                                 <span style="color:white;font-size:10px;font-weight:800;line-height:1.1;font-family:'Open Sans',Arial,sans-serif;">SADC</span>
                                 <span style="color:rgba(255,255,255,0.75);font-size:5.5px;line-height:1.2;font-family:'Open Sans',Arial,sans-serif;">S. AFRICA</span>
                             </div>
@@ -982,7 +982,7 @@
                     <!-- ECOWAS -->
                     <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
                         <div class="flex items-center gap-3 mb-4">
-                            <div style="width:48px;height:48px;border-radius:50%;background:#00953C;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+                            <div style="width:48px;height:48px;border-radius:50%;background:#7C3AED;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
                                 <span style="color:white;font-size:8px;font-weight:800;line-height:1.1;font-family:'Open Sans',Arial,sans-serif;">ECOWAS</span>
                                 <span style="color:rgba(255,255,255,0.75);font-size:5.5px;line-height:1.2;font-family:'Open Sans',Arial,sans-serif;">W. AFRICA</span>
                             </div>
@@ -1008,7 +1008,7 @@
                     <!-- EAC -->
                     <div class="bg-white rounded-lg shadow-sm border p-6" style="border-color: var(--heat-line);">
                         <div class="flex items-center gap-3 mb-4">
-                            <div style="width:48px;height:48px;border-radius:50%;background:#FF5721;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+                            <div style="width:48px;height:48px;border-radius:50%;background:#0891B2;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
                                 <span style="color:white;font-size:12px;font-weight:800;line-height:1.1;font-family:'Open Sans',Arial,sans-serif;">EAC</span>
                                 <span style="color:rgba(255,255,255,0.75);font-size:5.5px;line-height:1.2;font-family:'Open Sans',Arial,sans-serif;">E. AFRICA</span>
                             </div>
@@ -1062,7 +1062,7 @@
             <div id="section-timeline" class="hidden">
                 <div class="bg-white rounded-lg shadow-sm border p-6 mb-6" style="border-color: var(--heat-line);">
                     <h3 class="font-semibold heat-heading text-lg mb-2"><i class="fa-solid fa-timeline mr-2"></i>MEPS Implementation Timeline</h3>
-                    <p class="text-sm text-gray-500 mb-4 d5-section-subtitle">Key milestones in African MEPS adoption, 2016–2032. Sources: SADC Secretariat, EAC Standards Committee, ECREEE, U4E.</p>
+                    <p class="text-sm text-gray-500 mb-4 d5-section-subtitle">Key milestones in African MEPS adoption, 2015–2031. Sources: SADC Secretariat, EAC Standards Committee, ECREEE, U4E.</p>
                     <div id="d5-timeline-container"></div>
                 </div>
             </div>
@@ -2126,14 +2126,16 @@
 
 
                 // ── REC region outlines + ocean badges ──────────────────────
+                // Distinct colors that don't clash with MEPS status fill colors
                 svg.style('overflow', 'visible');
                 const REC_DEFS = [
-                  { key: 'SADC',   label: 'SADC',   sub: 'Southern Africa', fill: '#005CA8' },
-                  { key: 'ECOWAS', label: 'ECOWAS', sub: 'West Africa',     fill: '#00953C' },
-                  { key: 'EAC',    label: 'EAC',    sub: 'East Africa',     fill: '#FF5721' }
+                  { key: 'SADC',   label: 'SADC',   sub: 'Southern Africa', fill: '#B45309' },
+                  { key: 'ECOWAS', label: 'ECOWAS', sub: 'West Africa',     fill: '#7C3AED' },
+                  { key: 'EAC',    label: 'EAC',    sub: 'East Africa',     fill: '#0891B2' }
                 ];
+                window.REC_COLORS = { SADC: '#B45309', ECOWAS: '#7C3AED', EAC: '#0891B2' };
 
-                // Draw dashed coloured outlines for each country in each REC
+                // Draw outlines: white halo first, then colored dash on top (visible over any fill)
                 const outlineG = svg.append('g').attr('class', 'region-outlines').style('pointer-events', 'none');
                 REC_DEFS.forEach(rec => {
                   const members = (window.REGIONS && window.REGIONS[rec.key]) || [];
@@ -2142,20 +2144,21 @@
                     return members.includes(name) || members.includes(f.properties.name);
                   });
                   memberFeatures.forEach(f => {
-                    outlineG.append('path')
-                      .datum(f)
-                      .attr('d', path)
-                      .attr('fill', 'none')
-                      .attr('stroke', rec.fill)
-                      .attr('stroke-width', 2.2)
-                      .attr('stroke-dasharray', '5,3')
-                      .attr('opacity', 0.85);
+                    // White halo so dashes are visible over any country color
+                    outlineG.append('path').datum(f).attr('d', path)
+                      .attr('fill', 'none').attr('stroke', 'white').attr('stroke-width', 4)
+                      .attr('data-rec', rec.key);
+                    // Colored dash on top
+                    outlineG.append('path').datum(f).attr('d', path)
+                      .attr('fill', 'none').attr('stroke', rec.fill)
+                      .attr('stroke-width', 2.5).attr('stroke-dasharray', '6,3')
+                      .attr('data-rec', rec.key);
                   });
                 });
 
                 // Compute pixel bounding boxes for each REC and place ocean badges
                 const badgeG = svg.append('g').attr('class', 'region-badges').style('pointer-events', 'none');
-                const R = 28; // badge circle radius
+                const R = 28;
 
                 REC_DEFS.forEach(rec => {
                   const members = (window.REGIONS && window.REGIONS[rec.key]) || [];
@@ -2165,7 +2168,6 @@
                   });
                   if (!memberFeatures.length) return;
 
-                  // Compute merged bounding box in pixel space
                   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
                   memberFeatures.forEach(f => {
                     const b = path.bounds(f);
@@ -2174,36 +2176,34 @@
                     if (b[1][0] > x1) x1 = b[1][0];
                     if (b[1][1] > y1) y1 = b[1][1];
                   });
-                  const cx = (x0 + x1) / 2;
                   const cy = (y0 + y1) / 2;
 
-                  // Place badge in ocean: ECOWAS → left, EAC → right, SADC → bottom-right
+                  // Badges close to land edge, touching the region boundary
                   let bx, by, lx1, ly1, lx2, ly2;
                   if (rec.key === 'ECOWAS') {
-                    bx = x0 - 70; by = cy;
-                    lx1 = bx + R; ly1 = by;
-                    lx2 = x0;     ly2 = cy;
+                    bx = x0 - R - 8; by = cy;
+                    lx1 = bx + R; ly1 = by; lx2 = x0; ly2 = cy;
                   } else if (rec.key === 'EAC') {
-                    bx = x1 + 70; by = cy;
-                    lx1 = bx - R; ly1 = by;
-                    lx2 = x1;     ly2 = cy;
-                  } else { // SADC → bottom
-                    bx = x1 + 70; by = y1 + 55;
-                    lx1 = bx - R; ly1 = by;
-                    lx2 = x1;     ly2 = y1;
+                    bx = x1 + R + 8; by = cy;
+                    lx1 = bx - R; ly1 = by; lx2 = x1; ly2 = cy;
+                  } else { // SADC → bottom-right
+                    bx = x1 + R + 8; by = y1 + R + 10;
+                    lx1 = bx - R; ly1 = by; lx2 = x1; ly2 = y1;
                   }
 
                   // Connector line
                   badgeG.append('line')
-                    .attr('x1', lx1).attr('y1', ly1)
-                    .attr('x2', lx2).attr('y2', ly2)
+                    .attr('x1', lx1).attr('y1', ly1).attr('x2', lx2).attr('y2', ly2)
                     .attr('stroke', rec.fill).attr('stroke-width', 1.5)
-                    .attr('stroke-dasharray', '4,3').attr('opacity', 0.75);
+                    .attr('stroke-dasharray', '4,3').attr('opacity', 0.8)
+                    .attr('data-rec', rec.key);
 
                   // Badge circle
-                  const bg = badgeG.append('g').attr('transform', `translate(${bx},${by})`);
-                  bg.append('circle').attr('r', R).attr('fill', 'white').attr('opacity', 0.92);
-                  bg.append('circle').attr('r', R).attr('fill', 'none').attr('stroke', rec.fill).attr('stroke-width', 2.5).attr('opacity', 0.9);
+                  const bg = badgeG.append('g')
+                    .attr('transform', `translate(${bx},${by})`)
+                    .attr('data-rec', rec.key);
+                  bg.append('circle').attr('r', R).attr('fill', 'white').attr('opacity', 0.95);
+                  bg.append('circle').attr('r', R).attr('fill', 'none').attr('stroke', rec.fill).attr('stroke-width', 2.5);
                   bg.append('text').attr('text-anchor', 'middle').attr('dy', '-3')
                     .attr('font-size', rec.label.length > 4 ? '9px' : '11px').attr('font-weight', '800')
                     .attr('fill', rec.fill).attr('font-family', 'Open Sans, Arial, sans-serif').text(rec.label);
@@ -2402,8 +2402,7 @@
             svgEl.selectAll('path').each(function (d) {
               if (!d || !d.properties) return;
               const rawName = d.properties.name;
-              if (!rawName) return; // skip region boundary paths (no name property)
-              // normalise GeoJSON name to match COUNTRY_DATA keys
+              if (!rawName) return;
               const name = (typeof window.normaliseGeoName === 'function') ? window.normaliseGeoName(rawName) : rawName;
               const pathEl = d3.select(this);
               const inVisible = visibleSet.has(name);
@@ -2416,6 +2415,11 @@
                 pathEl.attr('fill', '#cbd5e1').attr('opacity', 0.65).attr('stroke', '#b0b8c4').attr('stroke-width', 0.4)
                       .style('pointer-events', 'none');
               }
+            });
+            // Show/hide REC badges and outlines: hide non-selected regions
+            ['SADC', 'ECOWAS', 'EAC'].forEach(recKey => {
+              const show = (activeRegion === 'ALL' || activeRegion === recKey);
+              svgEl.selectAll(`[data-rec="${recKey}"]`).style('display', show ? null : 'none');
             });
           }
           function updateStatsCards(visibleCountries) {
@@ -2855,9 +2859,9 @@
             { id: 'sadc_motors_target',    row: 'SADC',    date: '2027-01-01', label: 'SADC IE3\ntarget',     appliance: 'motors',        detail: 'SADC harmonized motor MEPS target: IE3 for motors 0.75–375 kW. Aligned with IEC 60034-30-1:2014 efficiency classes.', value: 'IE3 target', shape: 'diamond' },
           ];
           const CONFIG = {
-            yearStart: 2016, yearEnd: 2032,
+            yearStart: 2015, yearEnd: 2031,
             rows: ['SADC', 'EAC', 'ECOWAS', 'National'],
-            rowHeight: 130, marginTop: 40, marginBottom: 70, marginLeft: 90, marginRight: 40,
+            rowHeight: 150, marginTop: 40, marginBottom: 70, marginLeft: 90, marginRight: 40,
             dotRadius: 7, diamondSize: 9,
             colorCompleted: '#62D32F', colorUpcoming: '#FF5721', colorToday: '#003E51',
             colorGrid: '#e5e7eb', colorRowBg: ['#f9fafb', '#ffffff']
@@ -2956,8 +2960,10 @@
               tooltip.style('left', `${left}px`).style('top', `${top}px`);
             }
             function hideTooltip() { tooltip.style('display', 'none'); }
-            // Pre-compute label sides (above/below) to avoid overlap
-            const labelSide = {}; // ev.id -> true=above, false=below
+            // 4-level label collision avoidance
+            // Levels: 0=far above, 1=near above, 2=near below, 3=far below
+            const labelLevel = {}; // ev.id -> 0|1|2|3
+            const labelOffX  = {}; // ev.id -> px horizontal nudge
             const rowEventsSorted = {};
             activeEvents.forEach(ev => {
               if (!rowEventsSorted[ev.row]) rowEventsSorted[ev.row] = [];
@@ -2967,12 +2973,22 @@
               evs.sort((a, b) => a._cx - b._cx);
               let i = 0;
               while (i < evs.length) {
-                // Collect cluster of events within 80px
                 const cluster = [evs[i]];
                 let j = i + 1;
-                while (j < evs.length && evs[j]._cx - evs[i]._cx < 80) { cluster.push(evs[j]); j++; }
-                // Alternate above/below within cluster
-                cluster.forEach((ev, idx) => { labelSide[ev.id] = (idx % 2 === 0); });
+                while (j < evs.length && evs[j]._cx - evs[i]._cx < 55) { cluster.push(evs[j]); j++; }
+                // 4 positions cycling: far-above, near-below, near-above, far-below
+                const levelSeq = [0, 2, 1, 3];
+                cluster.forEach((ev, idx) => {
+                  labelLevel[ev.id] = levelSeq[idx % 4];
+                  // Horizontal nudge for events at the exact same x position
+                  const sameX = cluster.filter(e => Math.abs(e._cx - ev._cx) < 4);
+                  if (sameX.length > 1) {
+                    const sameIdx = sameX.indexOf(ev);
+                    labelOffX[ev.id] = (sameIdx % 2 === 0 ? -14 : 14);
+                  } else {
+                    labelOffX[ev.id] = 0;
+                  }
+                });
                 i = j;
               }
             });
@@ -2981,7 +2997,7 @@
               const rowBand = yScale(ev.row);
               if (rowBand === undefined) return;
               const cx = xScale(new Date(ev.date));
-              const cy = rowBand + yScale.bandwidth() / 2 + (ev.offsetY || 0);
+              const cy = rowBand + yScale.bandwidth() / 2;
               const color = isPast(ev.date) ? CONFIG.colorCompleted : CONFIG.colorUpcoming;
               const evGroup = g.append('g').attr('class', 'd5-event').attr('data-id', ev.id).style('cursor', 'pointer');
               if (ev.shape === 'diamond') {
@@ -2991,19 +3007,24 @@
                 evGroup.append('circle').attr('cx', cx).attr('cy', cy).attr('r', CONFIG.dotRadius).attr('fill', color).attr('stroke', '#ffffff').attr('stroke-width', 1.5);
               }
               const labelLines = ev.label.split('\n');
-              const above = labelSide[ev.id] !== false; // default above
-              const gap = CONFIG.dotRadius + 6;
+              const level = labelLevel[ev.id] !== undefined ? labelLevel[ev.id] : 0;
+              const offX  = labelOffX[ev.id] || 0;
+              const lx = cx + offX;
+              const gap = CONFIG.dotRadius + 5;
               const lineH = 11;
-              const labelY0 = above
-                ? cy - gap - (labelLines.length - 1) * lineH
-                : cy + gap + lineH;
-              // Stem line from dot to label
+              // 4 vertical positions
+              let labelY0;
+              if      (level === 0) labelY0 = cy - gap - (labelLines.length) * lineH - 6;  // far above
+              else if (level === 1) labelY0 = cy - gap - (labelLines.length - 1) * lineH;   // near above
+              else if (level === 2) labelY0 = cy + gap + lineH;                              // near below
+              else                  labelY0 = cy + gap + lineH * 2 + 6;                     // far below
+              const above = level < 2;
               const stemY1 = above ? cy - CONFIG.dotRadius - 2 : cy + CONFIG.dotRadius + 2;
               const stemY2 = above ? labelY0 + lineH * (labelLines.length - 1) + 3 : labelY0 - lineH + 1;
-              evGroup.append('line').attr('x1', cx).attr('x2', cx).attr('y1', stemY1).attr('y2', stemY2)
+              evGroup.append('line').attr('x1', cx).attr('x2', lx).attr('y1', stemY1).attr('y2', stemY2)
                 .attr('stroke', '#d1d5db').attr('stroke-width', 1).attr('stroke-dasharray', '2,2');
-              const textEl = evGroup.append('text').attr('x', cx).attr('y', labelY0).attr('text-anchor', 'middle').attr('font-size', '9.5px').attr('fill', '#374151');
-              labelLines.forEach((line, i) => { textEl.append('tspan').attr('x', cx).attr('dy', i === 0 ? 0 : `${lineH}px`).text(line); });
+              const textEl = evGroup.append('text').attr('x', lx).attr('y', labelY0).attr('text-anchor', 'middle').attr('font-size', '9.5px').attr('fill', '#374151');
+              labelLines.forEach((line, i) => { textEl.append('tspan').attr('x', lx).attr('dy', i === 0 ? 0 : `${lineH}px`).text(line); });
               evGroup.on('mouseenter', (event, _d) => showTooltip(event, ev)).on('mousemove', (event) => positionTooltip(event)).on('mouseleave', () => hideTooltip());
             });
             const legendItems = [
