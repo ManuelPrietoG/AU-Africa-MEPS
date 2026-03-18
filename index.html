@@ -1631,31 +1631,43 @@
 
             metricsEl.innerHTML = metricsHtml || '<div class="text-gray-400">No detailed metrics available</div>';
 
-            // Position panel near the click point
+            // Show panel first so offsetHeight is measurable
             const panel = document.getElementById('country-panel');
+            panel.classList.remove('hidden');
+            if (window.injectTagTooltips) window.injectTagTooltips(panel);
+
+            // Position near click — now offsetHeight is real
             if (clickX !== undefined && clickY !== undefined) {
-                const pw = 360, ph = panel.offsetHeight || 420;
+                const pw = panel.offsetWidth || 360;
+                const ph = panel.offsetHeight || 500;
                 const vw = window.innerWidth, vh = window.innerHeight;
                 const gap = 16;
                 // Prefer right of cursor; flip left if too close to right edge
                 let left = clickX + gap;
                 if (left + pw > vw - 8) left = clickX - pw - gap;
-                // Prefer below cursor; clamp so panel stays within viewport
+                if (left < 8) left = 8;
+                // Align top near cursor; clamp so panel stays within viewport
                 let top = clickY - 40;
                 if (top + ph > vh - 8) top = vh - ph - 8;
                 if (top < 8) top = 8;
                 panel.style.left = left + 'px';
                 panel.style.top  = top  + 'px';
             }
-            // Show panel
-            panel.classList.remove('hidden');
-            if (window.injectTagTooltips) window.injectTagTooltips(panel);
         }
 
         // Close country panel
         function closePanel() {
             document.getElementById('country-panel').classList.add('hidden');
         }
+
+        // Click outside panel → close it
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('country-panel');
+            if (!panel.classList.contains('hidden') && !panel.contains(e.target)) {
+                // Don't close if click was on an SVG country path (that triggers its own open)
+                if (!e.target.closest('svg')) closePanel();
+            }
+        });
 
         // Current selected country for modal
         let selectedCountry = null;
