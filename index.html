@@ -2126,16 +2126,16 @@
 
 
                 // ── REC region outlines + ocean badges ──────────────────────
-                // Distinct colors that don't clash with MEPS status fill colors
                 svg.style('overflow', 'visible');
                 const REC_DEFS = [
-                  { key: 'SADC',   label: 'SADC',   sub: 'Southern Africa', fill: '#B45309' },
-                  { key: 'ECOWAS', label: 'ECOWAS', sub: 'West Africa',     fill: '#7C3AED' },
-                  { key: 'EAC',    label: 'EAC',    sub: 'East Africa',     fill: '#0891B2' }
+                  // badgeLon/Lat: geographic position for badge placement
+                  { key: 'SADC',   label: 'SADC',   sub: 'S. Africa', fill: '#B45309', badgeLon: 51,  badgeLat: -27 }, // Indian Ocean, south of Madagascar
+                  { key: 'ECOWAS', label: 'ECOWAS', sub: 'W. Africa', fill: '#7C3AED', badgeLon: -1,  badgeLat:  2  }, // Gulf of Guinea, under Ghana
+                  { key: 'EAC',    label: 'EAC',    sub: 'E. Africa', fill: '#0891B2', badgeLon: 42,  badgeLat: -3  }  // Indian Ocean, closer to coast
                 ];
                 window.REC_COLORS = { SADC: '#B45309', ECOWAS: '#7C3AED', EAC: '#0891B2' };
 
-                // Draw outlines: white halo first, then colored dash on top (visible over any fill)
+                // Draw solid colored outlines: white halo (5px) + solid colored border (3px)
                 const outlineG = svg.append('g').attr('class', 'region-outlines').style('pointer-events', 'none');
                 REC_DEFS.forEach(rec => {
                   const members = (window.REGIONS && window.REGIONS[rec.key]) || [];
@@ -2144,61 +2144,23 @@
                     return members.includes(name) || members.includes(f.properties.name);
                   });
                   memberFeatures.forEach(f => {
-                    // White halo so dashes are visible over any country color
                     outlineG.append('path').datum(f).attr('d', path)
-                      .attr('fill', 'none').attr('stroke', 'white').attr('stroke-width', 4)
+                      .attr('fill', 'none').attr('stroke', 'white').attr('stroke-width', 5)
                       .attr('data-rec', rec.key);
-                    // Colored dash on top
                     outlineG.append('path').datum(f).attr('d', path)
-                      .attr('fill', 'none').attr('stroke', rec.fill)
-                      .attr('stroke-width', 2.5).attr('stroke-dasharray', '6,3')
+                      .attr('fill', 'none').attr('stroke', rec.fill).attr('stroke-width', 3)
                       .attr('data-rec', rec.key);
                   });
                 });
 
-                // Compute pixel bounding boxes for each REC and place ocean badges
+                // Place badges at fixed geographic coordinates — no connector lines
                 const badgeG = svg.append('g').attr('class', 'region-badges').style('pointer-events', 'none');
                 const R = 28;
 
                 REC_DEFS.forEach(rec => {
-                  const members = (window.REGIONS && window.REGIONS[rec.key]) || [];
-                  const memberFeatures = geoData.features.filter(f => {
-                    const name = window.normaliseGeoName ? window.normaliseGeoName(f.properties.name) : f.properties.name;
-                    return members.includes(name) || members.includes(f.properties.name);
-                  });
-                  if (!memberFeatures.length) return;
-
-                  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-                  memberFeatures.forEach(f => {
-                    const b = path.bounds(f);
-                    if (b[0][0] < x0) x0 = b[0][0];
-                    if (b[0][1] < y0) y0 = b[0][1];
-                    if (b[1][0] > x1) x1 = b[1][0];
-                    if (b[1][1] > y1) y1 = b[1][1];
-                  });
-                  const cy = (y0 + y1) / 2;
-
-                  // Badges close to land edge, touching the region boundary
-                  let bx, by, lx1, ly1, lx2, ly2;
-                  if (rec.key === 'ECOWAS') {
-                    bx = x0 - R - 8; by = cy;
-                    lx1 = bx + R; ly1 = by; lx2 = x0; ly2 = cy;
-                  } else if (rec.key === 'EAC') {
-                    bx = x1 + R + 8; by = cy;
-                    lx1 = bx - R; ly1 = by; lx2 = x1; ly2 = cy;
-                  } else { // SADC → bottom-right
-                    bx = x1 + R + 8; by = y1 + R + 10;
-                    lx1 = bx - R; ly1 = by; lx2 = x1; ly2 = y1;
-                  }
-
-                  // Connector line
-                  badgeG.append('line')
-                    .attr('x1', lx1).attr('y1', ly1).attr('x2', lx2).attr('y2', ly2)
-                    .attr('stroke', rec.fill).attr('stroke-width', 1.5)
-                    .attr('stroke-dasharray', '4,3').attr('opacity', 0.8)
-                    .attr('data-rec', rec.key);
-
-                  // Badge circle
+                  const pos = projection([rec.badgeLon, rec.badgeLat]);
+                  if (!pos) return;
+                  const [bx, by] = pos;
                   const bg = badgeG.append('g')
                     .attr('transform', `translate(${bx},${by})`)
                     .attr('data-rec', rec.key);
