@@ -273,17 +273,29 @@
   border-color: var(--heat-blue-800, #003e51);
   color: #ffffff;
 }
-.d1-region-btn--active[data-region="SADC"] {
-  background: #B45309;
-  border-color: #B45309;
+/* SADC — amber, inactive: colored text+border, active: filled */
+.d1-region-btn[data-region="SADC"] {
+  color: #B45309; border-color: #B45309;
 }
-.d1-region-btn--active[data-region="ECOWAS"] {
-  background: #7C3AED;
-  border-color: #7C3AED;
+.d1-region-btn--active[data-region="SADC"],
+.d1-region-btn[aria-pressed="true"][data-region="SADC"] {
+  background: #B45309; border-color: #B45309; color: #ffffff;
 }
-.d1-region-btn--active[data-region="EAC"] {
-  background: #0891B2;
-  border-color: #0891B2;
+/* ECOWAS — purple */
+.d1-region-btn[data-region="ECOWAS"] {
+  color: #7C3AED; border-color: #7C3AED;
+}
+.d1-region-btn--active[data-region="ECOWAS"],
+.d1-region-btn[aria-pressed="true"][data-region="ECOWAS"] {
+  background: #7C3AED; border-color: #7C3AED; color: #ffffff;
+}
+/* EAC — teal */
+.d1-region-btn[data-region="EAC"] {
+  color: #0891B2; border-color: #0891B2;
+}
+.d1-region-btn--active[data-region="EAC"],
+.d1-region-btn[aria-pressed="true"][data-region="EAC"] {
+  background: #0891B2; border-color: #0891B2; color: #ffffff;
 }
 .d1-result-count {
   font-size: 11px;
@@ -621,12 +633,9 @@
                 </div>
             </div>
 
-            <!-- D1: Search + Filter Bar -->
-            <div id="d1-search-bar-container"></div>
-
             <!-- Map -->
             <div class="bg-white rounded-lg shadow-sm border p-4" style="border-color: var(--heat-line);">
-                <div class="flex justify-between items-center mb-3">
+                <div class="flex justify-between items-center mb-2">
                     <h3 class="font-semibold heat-heading"><i class="fa-solid fa-earth-africa mr-2"></i>Implementation Map</h3>
                     <div class="flex gap-4 text-xs" style="color: var(--heat-text);">
                         <span><span class="inline-block w-3 h-3 rounded-full mr-1" style="background: var(--heat-green-600);"></span>Mandatory</span>
@@ -635,6 +644,8 @@
                         <span><span class="inline-block w-3 h-3 rounded-full mr-1" style="background: #cbd5e1;"></span>None</span>
                     </div>
                 </div>
+                <!-- Search bar inside map card -->
+                <div id="d1-search-bar-container" class="mb-2"></div>
                 <!-- Map wrapper: relative so filter overlay can sit inside -->
                 <div style="position: relative;">
                     <div id="map" style="width: 100%; height: 680px; min-height: 680px; background: var(--heat-bg-alt); border-radius: 6px;"></div>
@@ -2330,10 +2341,10 @@
             const overlay = document.getElementById('d1-map-filter-overlay');
             if (overlay) {
               overlay.innerHTML = `
-                <button class="d1-region-btn d1-region-btn--active" data-region="ALL"   aria-pressed="true"  style="background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);">All Africa</button>
-                <button class="d1-region-btn" data-region="SADC"   aria-pressed="false" style="background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);">SADC</button>
-                <button class="d1-region-btn" data-region="ECOWAS" aria-pressed="false" style="background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);">ECOWAS</button>
-                <button class="d1-region-btn" data-region="EAC"    aria-pressed="false" style="background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);">EAC</button>
+                <button class="d1-region-btn d1-region-btn--active" data-region="ALL"   aria-pressed="true">All Africa</button>
+                <button class="d1-region-btn" data-region="SADC"   aria-pressed="false">SADC</button>
+                <button class="d1-region-btn" data-region="ECOWAS" aria-pressed="false">ECOWAS</button>
+                <button class="d1-region-btn" data-region="EAC"    aria-pressed="false">EAC</button>
               `;
             }
           }
