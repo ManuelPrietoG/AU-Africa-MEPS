@@ -2128,14 +2128,13 @@
                 // ── REC region outlines + ocean badges ──────────────────────
                 svg.style('overflow', 'visible');
                 const REC_DEFS = [
-                  // badgeLon/Lat: geographic position for badge placement
-                  { key: 'SADC',   label: 'SADC',   sub: 'S. Africa', fill: '#B45309', badgeLon: 51,  badgeLat: -27 }, // Indian Ocean, south of Madagascar
-                  { key: 'ECOWAS', label: 'ECOWAS', sub: 'W. Africa', fill: '#7C3AED', badgeLon: -1,  badgeLat:  2  }, // Gulf of Guinea, under Ghana
-                  { key: 'EAC',    label: 'EAC',    sub: 'E. Africa', fill: '#0891B2', badgeLon: 42,  badgeLat: -3  }  // Indian Ocean, closer to coast
+                  { key: 'SADC',   label: 'SADC',   sub: 'S. Africa', fill: '#B45309', badgeLon: 55,  badgeLat: -28 }, // Indian Ocean, south of Madagascar
+                  { key: 'ECOWAS', label: 'ECOWAS', sub: 'W. Africa', fill: '#7C3AED', badgeLon: -4,  badgeLat:  0  }, // Gulf of Guinea, under Ghana
+                  { key: 'EAC',    label: 'EAC',    sub: 'E. Africa', fill: '#0891B2', badgeLon: 45,  badgeLat: -7  }  // Indian Ocean, closer to coast
                 ];
                 window.REC_COLORS = { SADC: '#B45309', ECOWAS: '#7C3AED', EAC: '#0891B2' };
 
-                // Draw solid colored outlines: white halo (5px) + solid colored border (3px)
+                // Outlines: white halo (4px) + solid colored border matching circle stroke (2.5px)
                 const outlineG = svg.append('g').attr('class', 'region-outlines').style('pointer-events', 'none');
                 REC_DEFS.forEach(rec => {
                   const members = (window.REGIONS && window.REGIONS[rec.key]) || [];
@@ -2145,16 +2144,16 @@
                   });
                   memberFeatures.forEach(f => {
                     outlineG.append('path').datum(f).attr('d', path)
-                      .attr('fill', 'none').attr('stroke', 'white').attr('stroke-width', 5)
+                      .attr('fill', 'none').attr('stroke', 'white').attr('stroke-width', 4)
                       .attr('data-rec', rec.key);
                     outlineG.append('path').datum(f).attr('d', path)
-                      .attr('fill', 'none').attr('stroke', rec.fill).attr('stroke-width', 3)
+                      .attr('fill', 'none').attr('stroke', rec.fill).attr('stroke-width', 2.5)
                       .attr('data-rec', rec.key);
                   });
                 });
 
-                // Place badges at fixed geographic coordinates — no connector lines
-                const badgeG = svg.append('g').attr('class', 'region-badges').style('pointer-events', 'none');
+                // Badges at fixed geographic coords — clickable, trigger region filter
+                const badgeG = svg.append('g').attr('class', 'region-badges');
                 const R = 28;
 
                 REC_DEFS.forEach(rec => {
@@ -2163,15 +2162,19 @@
                   const [bx, by] = pos;
                   const bg = badgeG.append('g')
                     .attr('transform', `translate(${bx},${by})`)
-                    .attr('data-rec', rec.key);
+                    .attr('data-rec', rec.key)
+                    .style('cursor', 'pointer');
                   bg.append('circle').attr('r', R).attr('fill', 'white').attr('opacity', 0.95);
                   bg.append('circle').attr('r', R).attr('fill', 'none').attr('stroke', rec.fill).attr('stroke-width', 2.5);
                   bg.append('text').attr('text-anchor', 'middle').attr('dy', '-3')
                     .attr('font-size', rec.label.length > 4 ? '9px' : '11px').attr('font-weight', '800')
-                    .attr('fill', rec.fill).attr('font-family', 'Open Sans, Arial, sans-serif').text(rec.label);
+                    .attr('fill', rec.fill).attr('font-family', 'Open Sans, Arial, sans-serif')
+                    .style('pointer-events', 'none').text(rec.label);
                   bg.append('text').attr('text-anchor', 'middle').attr('dy', '10')
                     .attr('font-size', '7px').attr('fill', '#374151')
-                    .attr('font-family', 'Open Sans, Arial, sans-serif').text(rec.sub);
+                    .attr('font-family', 'Open Sans, Arial, sans-serif')
+                    .style('pointer-events', 'none').text(rec.sub);
+                  bg.on('click', () => { if (window.D1_setRegion) window.D1_setRegion(rec.key); });
                 });
 
                 updateStats();
@@ -2496,6 +2499,17 @@
             applyFilters();
           };
           window.D1_refreshMap = function () { applyFilters(); };
+          window.D1_setRegion = function (region) {
+            const next = (activeRegion === region) ? 'ALL' : region; // toggle: click same → reset
+            activeRegion = next;
+            document.querySelectorAll('.d1-region-btn').forEach(b => {
+              b.classList.remove('d1-region-btn--active');
+              b.setAttribute('aria-pressed', 'false');
+            });
+            const target = document.querySelector(`.d1-region-btn[data-region="${next}"]`);
+            if (target) { target.classList.add('d1-region-btn--active'); target.setAttribute('aria-pressed', 'true'); }
+            applyFilters();
+          };
           window.D1_getVisibleCountries = getVisibleCountries;
           function init() {
             injectSearchBar();
