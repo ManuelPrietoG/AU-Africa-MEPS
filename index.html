@@ -2859,7 +2859,7 @@
           const CONFIG = {
             yearStart: 2015, yearEnd: 2031,
             rows: ['SADC', 'EAC', 'ECOWAS', 'National'],
-            rowHeight: 150, marginTop: 40, marginBottom: 70, marginLeft: 90, marginRight: 40,
+            rowHeight: 150, marginTop: 70, marginBottom: 70, marginLeft: 90, marginRight: 90,
             dotRadius: 7, diamondSize: 9,
             colorCompleted: '#62D32F', colorUpcoming: '#FF5721', colorToday: '#003E51',
             colorGrid: '#e5e7eb', colorRowBg: ['#f9fafb', '#ffffff']
@@ -2907,7 +2907,7 @@
             const height = CONFIG.marginTop + CONFIG.rows.length * CONFIG.rowHeight + CONFIG.marginBottom;
             const svg = d3.select('#d5-timeline-container').append('svg').attr('id', 'd5-svg')
               .attr('width', '100%').attr('height', height).attr('viewBox', `0 0 ${width} ${height}`)
-              .attr('preserveAspectRatio', 'xMinYMid meet').style('font-family', 'inherit');
+              .attr('preserveAspectRatio', 'xMinYMid meet').style('font-family', 'inherit').style('overflow', 'visible');
             const innerWidth = width - CONFIG.marginLeft - CONFIG.marginRight;
             const innerHeight = CONFIG.rows.length * CONFIG.rowHeight;
             const xScale = d3.scaleTime().domain([new Date(CONFIG.yearStart, 0, 1), new Date(CONFIG.yearEnd, 11, 31)]).range([0, innerWidth]);
