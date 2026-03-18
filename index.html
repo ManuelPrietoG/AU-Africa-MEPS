@@ -1062,7 +1062,7 @@
             <div id="section-timeline" class="hidden">
                 <div class="bg-white rounded-lg shadow-sm border p-6 mb-6" style="border-color: var(--heat-line);">
                     <h3 class="font-semibold heat-heading text-lg mb-2"><i class="fa-solid fa-timeline mr-2"></i>MEPS Implementation Timeline</h3>
-                    <p class="text-sm text-gray-500 mb-4 d5-section-subtitle">Key milestones in African MEPS adoption, 2010–2035. Sources: SADC Secretariat, EAC Standards Committee, ECREEE, U4E.</p>
+                    <p class="text-sm text-gray-500 mb-4 d5-section-subtitle">Key milestones in African MEPS adoption, 2016–2032. Sources: SADC Secretariat, EAC Standards Committee, ECREEE, U4E.</p>
                     <div id="d5-timeline-container"></div>
                 </div>
             </div>
@@ -1339,6 +1339,11 @@
                         refrigeration_eei_max: row.refrigeration_eei_max,
                         motors_level: row.motors_level,
                         lighting_efficacy_min: row.lighting_efficacy_min,
+                        lighting_led_min: row.lighting_led_min || null,
+                        lighting_t8_min: row.lighting_t8_min || null,
+                        lighting_street_min: row.lighting_street_min || null,
+                        lighting_cfl_banned: row.lighting_cfl_banned || false,
+                        lighting_incandescent_banned: row.lighting_incandescent_banned || false,
                         electricity_tariff: row.electricity_tariff,
                         grid_emission_factor: row.grid_emission_factor,
                         ac_stock_thousands: row.ac_stock_thousands,
@@ -1400,17 +1405,17 @@
             "Cote d'Ivoire": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
             "Democratic Republic of the Congo": { region: "SADC", region_secondary: "EAC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Djibouti": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
-            "Egypt": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Egypt": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "80", lighting_incandescent_banned: true, lighting_cfl_banned: false },
             "Equatorial Guinea": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
             "Eritrea": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
             "Eswatini": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Ethiopia": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
             "Gabon": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
             "Gambia": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
-            "Ghana": { region: "ECOWAS", status: "Mandatory", motors: "Mandatory (IE2)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Ghana": { region: "ECOWAS", status: "Mandatory", motors: "Mandatory (IE2)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "70", lighting_incandescent_banned: true, lighting_cfl_banned: false },
             "Guinea": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
             "Guinea-Bissau": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
-            "Kenya": { region: "EAC", status: "Mandatory", motors: "Mandatory (IE3-eq)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Kenya": { region: "EAC", status: "Mandatory", motors: "Mandatory (IE3-eq)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "80", lighting_incandescent_banned: false, lighting_cfl_banned: false },
             "Lesotho": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Liberia": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
             "Libya": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
@@ -1419,24 +1424,24 @@
             "Mali": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
             "Mauritania": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
             "Mauritius": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
-            "Morocco": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Morocco": { region: "AFREC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "80", lighting_incandescent_banned: true, lighting_cfl_banned: false },
             "Mozambique": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Namibia": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Niger": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
-            "Nigeria": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Mandatory", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
-            "Rwanda": { region: "EAC", status: "Mandatory", motors: "Regional (Development)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Nigeria": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Mandatory", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)", lighting_led_min: "70", lighting_incandescent_banned: false, lighting_cfl_banned: false },
+            "Rwanda": { region: "EAC", status: "Mandatory", motors: "Regional (Development)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "70", lighting_incandescent_banned: false, lighting_cfl_banned: false },
             "Sao Tome and Principe": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
-            "Senegal": { region: "ECOWAS", status: "Regional (Development)", motors: "Mandatory (IE3)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
+            "Senegal": { region: "ECOWAS", status: "Regional (Development)", motors: "Mandatory (IE3)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)", lighting_led_min: "70", lighting_incandescent_banned: false, lighting_cfl_banned: false },
             "Seychelles": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Sierra Leone": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
             "Somalia": { region: "EAC", status: "Regional (Harmonized)", motors: "Regional (Development)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
-            "South Africa": { region: "SADC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "South Africa": { region: "SADC", status: "Mandatory", motors: "Mandatory (IE3)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "80", lighting_t8_min: "60", lighting_incandescent_banned: true, lighting_cfl_banned: false },
             "South Sudan": { region: "EAC", status: "Regional (Harmonized)", motors: "Regional (Development)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Sudan": { region: "AFREC", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None" },
-            "Tanzania": { region: "SADC", region_secondary: "EAC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
+            "Tanzania": { region: "SADC", region_secondary: "EAC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)", lighting_led_min: "70", lighting_incandescent_banned: false, lighting_cfl_banned: false },
             "Togo": { region: "ECOWAS", status: "Regional (Development)", motors: "Regional (Development)", rac: "Regional (Directive)", lighting: "Regional (Directive)", refrigeration: "Regional (Directive)" },
-            "Tunisia": { region: "AFREC", status: "Mandatory", motors: "None", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
-            "Uganda": { region: "EAC", status: "Mandatory", motors: "Regional (Development)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory" },
+            "Tunisia": { region: "AFREC", status: "Mandatory", motors: "None", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "80", lighting_incandescent_banned: true, lighting_cfl_banned: false },
+            "Uganda": { region: "EAC", status: "Mandatory", motors: "Regional (Development)", rac: "Mandatory", lighting: "Mandatory", refrigeration: "Mandatory", lighting_led_min: "70", lighting_incandescent_banned: false, lighting_cfl_banned: false },
             "Zambia": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Zimbabwe": { region: "SADC", status: "Regional (Harmonized)", motors: "Regional (Harmonized)", rac: "Regional (Harmonized)", lighting: "Regional (Harmonized)", refrigeration: "Regional (Harmonized)" },
             "Western Sahara": { region: "N/A", status: "None", motors: "None", rac: "None", lighting: "None", refrigeration: "None", disputed: true, note: "Disputed territory. Administered by Morocco; sovereignty claimed by the Sahrawi Arab Democratic Republic. No national MEPS framework in place." }
@@ -1680,7 +1685,7 @@
             const appliances = [
                 { key: 'rac', name: 'Air Conditioners', icon: 'snowflake', metric: 'CSPF', minKey: 'rac_cspf_min', targetKey: 'rac_cspf_target' },
                 { key: 'refrigeration', name: 'Refrigerators', icon: 'box-archive', metric: 'EEI', maxKey: 'refrigeration_eei_max' },
-                { key: 'lighting', name: 'Lighting', icon: 'lightbulb', metric: 'lm/W', minKey: 'lighting_efficacy_min' },
+                { key: 'lighting', name: 'Lighting', icon: 'lightbulb', metric: 'lm/W', minKey: 'lighting_efficacy_min', disaggregated: true },
                 { key: 'motors', name: 'Electric Motors', icon: 'gear', metric: 'IE Class', levelKey: 'motors_level' }
             ];
 
@@ -1689,7 +1694,24 @@
                 const badge = getStatusBadge(appStatus);
 
                 let metricHtml = '';
-                if (app.key === 'rac' && app.minKey && data[app.minKey]) {
+                if (app.key === 'lighting' && app.disaggregated && data.lighting_led_min) {
+                    // Product-type breakdown table
+                    const rowStyle = 'display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #e5e7eb;font-size:11px;';
+                    const banStyle = (banned) => banned
+                        ? 'color:#dc2626;font-weight:600;'
+                        : 'color:#6b7280;';
+                    metricHtml = `<div style="margin-top:8px;">`;
+                    metricHtml += `<div style="${rowStyle}"><span style="color:#374151;">LED lamps</span><span style="color:#005ca8;font-weight:600;">≥ ${data.lighting_led_min} lm/W</span></div>`;
+                    if (data.lighting_t8_min) {
+                        metricHtml += `<div style="${rowStyle}"><span style="color:#374151;">Fluorescent T8</span><span style="color:#005ca8;font-weight:600;">≥ ${data.lighting_t8_min} lm/W</span></div>`;
+                    }
+                    if (data.lighting_street_min) {
+                        metricHtml += `<div style="${rowStyle}"><span style="color:#374151;">Street lighting</span><span style="color:#005ca8;font-weight:600;">≥ ${data.lighting_street_min} lm/W</span></div>`;
+                    }
+                    metricHtml += `<div style="${rowStyle}"><span style="color:#374151;">Incandescent</span><span style="${banStyle(data.lighting_incandescent_banned)}">${data.lighting_incandescent_banned ? 'Banned' : 'No ban'}</span></div>`;
+                    metricHtml += `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px;"><span style="color:#374151;">CFL (mercury)</span><span style="${banStyle(data.lighting_cfl_banned)}">${data.lighting_cfl_banned ? 'Banned' : 'Permitted'}</span></div>`;
+                    metricHtml += `</div>`;
+                } else if (app.key === 'rac' && app.minKey && data[app.minKey]) {
                     const isEER   = data.rac_metric_type === 'EER';
                     const isNSEER = data.rac_metric_type === 'NSEER';
                     const metricLabel = isNSEER ? 'NSEER' : 'CSPF';
@@ -2070,7 +2092,7 @@
                 hideMapLoading();
 
                 const projection = d3.geoMercator()
-                    .fitExtent([[10, 10], [width - 10, height - 10]], geoData);
+                    .fitExtent([[90, 10], [width - 90, height - 60]], geoData);
 
                 path = d3.geoPath().projection(projection);
 
@@ -2103,25 +2125,91 @@
                     });
 
 
-                // Regional organisation badges on the map
-                const REC_BADGES = [
-                  { label: 'SADC', sub: 'Southern Africa', lon: 26,  lat: -20, fill: '#005CA8' },
-                  { label: 'ECOWAS', sub: 'West Africa',   lon: -1,  lat:  10, fill: '#00953C' },
-                  { label: 'EAC',   sub: 'East Africa',    lon: 35,  lat:  -2, fill: '#FF5721' }
+                // ── REC region outlines + ocean badges ──────────────────────
+                svg.style('overflow', 'visible');
+                const REC_DEFS = [
+                  { key: 'SADC',   label: 'SADC',   sub: 'Southern Africa', fill: '#005CA8' },
+                  { key: 'ECOWAS', label: 'ECOWAS', sub: 'West Africa',     fill: '#00953C' },
+                  { key: 'EAC',    label: 'EAC',    sub: 'East Africa',     fill: '#FF5721' }
                 ];
-                const badgeG = svg.append('g').attr('class', 'region-badges').attr('transform', `translate(0,0)`).style('pointer-events', 'none');
-                REC_BADGES.forEach(b => {
-                  const [bx, by] = projection([b.lon, b.lat]);
-                  if (!bx || !by) return;
+
+                // Draw dashed coloured outlines for each country in each REC
+                const outlineG = svg.append('g').attr('class', 'region-outlines').style('pointer-events', 'none');
+                REC_DEFS.forEach(rec => {
+                  const members = (window.REGIONS && window.REGIONS[rec.key]) || [];
+                  const memberFeatures = geoData.features.filter(f => {
+                    const name = window.normaliseGeoName ? window.normaliseGeoName(f.properties.name) : f.properties.name;
+                    return members.includes(name) || members.includes(f.properties.name);
+                  });
+                  memberFeatures.forEach(f => {
+                    outlineG.append('path')
+                      .datum(f)
+                      .attr('d', path)
+                      .attr('fill', 'none')
+                      .attr('stroke', rec.fill)
+                      .attr('stroke-width', 2.2)
+                      .attr('stroke-dasharray', '5,3')
+                      .attr('opacity', 0.85);
+                  });
+                });
+
+                // Compute pixel bounding boxes for each REC and place ocean badges
+                const badgeG = svg.append('g').attr('class', 'region-badges').style('pointer-events', 'none');
+                const R = 28; // badge circle radius
+
+                REC_DEFS.forEach(rec => {
+                  const members = (window.REGIONS && window.REGIONS[rec.key]) || [];
+                  const memberFeatures = geoData.features.filter(f => {
+                    const name = window.normaliseGeoName ? window.normaliseGeoName(f.properties.name) : f.properties.name;
+                    return members.includes(name) || members.includes(f.properties.name);
+                  });
+                  if (!memberFeatures.length) return;
+
+                  // Compute merged bounding box in pixel space
+                  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+                  memberFeatures.forEach(f => {
+                    const b = path.bounds(f);
+                    if (b[0][0] < x0) x0 = b[0][0];
+                    if (b[0][1] < y0) y0 = b[0][1];
+                    if (b[1][0] > x1) x1 = b[1][0];
+                    if (b[1][1] > y1) y1 = b[1][1];
+                  });
+                  const cx = (x0 + x1) / 2;
+                  const cy = (y0 + y1) / 2;
+
+                  // Place badge in ocean: ECOWAS → left, EAC → right, SADC → bottom-right
+                  let bx, by, lx1, ly1, lx2, ly2;
+                  if (rec.key === 'ECOWAS') {
+                    bx = x0 - 70; by = cy;
+                    lx1 = bx + R; ly1 = by;
+                    lx2 = x0;     ly2 = cy;
+                  } else if (rec.key === 'EAC') {
+                    bx = x1 + 70; by = cy;
+                    lx1 = bx - R; ly1 = by;
+                    lx2 = x1;     ly2 = cy;
+                  } else { // SADC → bottom
+                    bx = x1 + 70; by = y1 + 55;
+                    lx1 = bx - R; ly1 = by;
+                    lx2 = x1;     ly2 = y1;
+                  }
+
+                  // Connector line
+                  badgeG.append('line')
+                    .attr('x1', lx1).attr('y1', ly1)
+                    .attr('x2', lx2).attr('y2', ly2)
+                    .attr('stroke', rec.fill).attr('stroke-width', 1.5)
+                    .attr('stroke-dasharray', '4,3').attr('opacity', 0.75);
+
+                  // Badge circle
                   const bg = badgeG.append('g').attr('transform', `translate(${bx},${by})`);
-                  // Outer white circle for contrast
-                  bg.append('circle').attr('r', 26).attr('fill', 'white').attr('opacity', 0.85);
-                  // Coloured ring
-                  bg.append('circle').attr('r', 26).attr('fill', 'none').attr('stroke', b.fill).attr('stroke-width', 2.5).attr('opacity', 0.9);
-                  // Acronym text
-                  bg.append('text').attr('text-anchor', 'middle').attr('dy', '-2').attr('font-size', b.label.length > 4 ? '8px' : '10px').attr('font-weight', '800').attr('fill', b.fill).attr('font-family', 'Open Sans, Arial, sans-serif').text(b.label);
-                  // Sub-label
-                  bg.append('text').attr('text-anchor', 'middle').attr('dy', '10').attr('font-size', '6px').attr('fill', '#374151').attr('font-family', 'Open Sans, Arial, sans-serif').text(b.sub);
+                  bg.append('circle').attr('r', R).attr('fill', 'white').attr('opacity', 0.92);
+                  bg.append('circle').attr('r', R).attr('fill', 'none').attr('stroke', rec.fill).attr('stroke-width', 2.5).attr('opacity', 0.9);
+                  bg.append('text').attr('text-anchor', 'middle').attr('dy', '-3')
+                    .attr('font-size', rec.label.length > 4 ? '9px' : '11px').attr('font-weight', '800')
+                    .attr('fill', rec.fill).attr('font-family', 'Open Sans, Arial, sans-serif').text(rec.label);
+                  bg.append('text').attr('text-anchor', 'middle').attr('dy', '10')
+                    .attr('font-size', '7px').attr('fill', '#374151')
+                    .attr('font-family', 'Open Sans, Arial, sans-serif').text(rec.sub);
                 });
 
                 updateStats();
@@ -2767,7 +2855,7 @@
             { id: 'sadc_motors_target',    row: 'SADC',    date: '2027-01-01', label: 'SADC IE3\ntarget',     appliance: 'motors',        detail: 'SADC harmonized motor MEPS target: IE3 for motors 0.75–375 kW. Aligned with IEC 60034-30-1:2014 efficiency classes.', value: 'IE3 target', shape: 'diamond' },
           ];
           const CONFIG = {
-            yearStart: 2010, yearEnd: 2035,
+            yearStart: 2016, yearEnd: 2032,
             rows: ['SADC', 'EAC', 'ECOWAS', 'National'],
             rowHeight: 130, marginTop: 40, marginBottom: 70, marginLeft: 90, marginRight: 40,
             dotRadius: 7, diamondSize: 9,
@@ -2925,10 +3013,14 @@
               { type: 'diamond', color: CONFIG.colorUpcoming,  label: 'Upcoming target' },
               { type: 'dashed',  color: CONFIG.colorToday,     label: 'Today' }
             ];
-            const legendG = svg.append('g').attr('transform', `translate(${CONFIG.marginLeft},${height - CONFIG.marginBottom + 18})`);
+            // Compute total legend width then centre it
+            const _iconW = 20, _gap = 6, _itemSpacing = 16;
+            const _legendTotalW = legendItems.reduce((sum, item) => sum + _iconW + _gap + item.label.length * 6.5 + _itemSpacing, 0) - _itemSpacing;
+            const _legendX = CONFIG.marginLeft + (innerWidth - _legendTotalW) / 2;
+            const legendG = svg.append('g').attr('transform', `translate(${_legendX},${height - CONFIG.marginBottom + 28})`);
             let lx = 0;
             legendItems.forEach(item => {
-              const iconW = 20, gap = 6, textW = item.label.length * 6.5;
+              const iconW = _iconW, gap = _gap, textW = item.label.length * 6.5;
               if (item.type === 'dashed') {
                 legendG.append('line').attr('x1', lx).attr('x2', lx + iconW).attr('y1', 7).attr('y2', 7).attr('stroke', item.color).attr('stroke-width', 2).attr('stroke-dasharray', '5,3');
               } else if (item.type === 'diamond') {
@@ -2938,7 +3030,7 @@
                 legendG.append('circle').attr('cx', lx + 10).attr('cy', 7).attr('r', 6).attr('fill', item.color);
               }
               legendG.append('text').attr('x', lx + iconW + gap).attr('y', 11).attr('font-size', '10px').attr('fill', '#6b7280').text(item.label);
-              lx += iconW + gap + textW + 16;
+              lx += iconW + gap + textW + _itemSpacing;
             });
             console.log('D5: Timeline rendered.');
           }
