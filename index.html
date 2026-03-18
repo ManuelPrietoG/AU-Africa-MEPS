@@ -647,7 +647,7 @@
             <div id="tooltip" style="position: fixed; background: var(--heat-blue-800); color: white; padding: 10px 14px; border-radius: 6px; font-size: 12px; pointer-events: none; opacity: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
 
             <!-- Country Detail Panel -->
-            <div id="country-panel" class="hidden fixed right-8 top-24 bg-white rounded-lg shadow-xl border z-50" style="border-color: var(--heat-line); width: 360px;">
+            <div id="country-panel" class="hidden bg-white rounded-lg shadow-xl border z-50" style="border-color: var(--heat-line); width: 360px; position: fixed; top: 80px; left: 80px;">
                 <div class="p-4 border-b flex justify-between items-center" style="background: var(--heat-blue-800); border-radius: 8px 8px 0 0;">
                     <h3 id="panel-country-name" class="font-bold text-white text-lg"></h3>
                     <button onclick="closePanel()" class="text-white/60 hover:text-white text-xl">&times;</button>
@@ -1561,7 +1561,7 @@
         }
 
         // Show country detail panel
-        function showCountryPanel(countryName) {
+        function showCountryPanel(countryName, clickX, clickY) {
             const data = COUNTRY_DATA[countryName];
             if (!data) return;
 
@@ -1631,9 +1631,25 @@
 
             metricsEl.innerHTML = metricsHtml || '<div class="text-gray-400">No detailed metrics available</div>';
 
+            // Position panel near the click point
+            const panel = document.getElementById('country-panel');
+            if (clickX !== undefined && clickY !== undefined) {
+                const pw = 360, ph = panel.offsetHeight || 420;
+                const vw = window.innerWidth, vh = window.innerHeight;
+                const gap = 16;
+                // Prefer right of cursor; flip left if too close to right edge
+                let left = clickX + gap;
+                if (left + pw > vw - 8) left = clickX - pw - gap;
+                // Prefer below cursor; clamp so panel stays within viewport
+                let top = clickY - 40;
+                if (top + ph > vh - 8) top = vh - ph - 8;
+                if (top < 8) top = 8;
+                panel.style.left = left + 'px';
+                panel.style.top  = top  + 'px';
+            }
             // Show panel
-            document.getElementById('country-panel').classList.remove('hidden');
-            if (window.injectTagTooltips) window.injectTagTooltips(document.getElementById('country-panel'));
+            panel.classList.remove('hidden');
+            if (window.injectTagTooltips) window.injectTagTooltips(panel);
         }
 
         // Close country panel
@@ -2126,7 +2142,7 @@
                     })
                     .on('click', function(event, d) {
                         const canonicalName = window.normaliseGeoName ? window.normaliseGeoName(d.properties.name) : d.properties.name;
-                        showCountryPanel(canonicalName);
+                        showCountryPanel(canonicalName, event.clientX, event.clientY);
                     });
 
 
