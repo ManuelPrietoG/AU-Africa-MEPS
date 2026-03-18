@@ -251,16 +251,17 @@
   flex-wrap: wrap;
 }
 .d1-region-btn {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 16px;
   border-radius: 20px;
-  border: 1.5px solid #d1d5db;
+  border: 2px solid #d1d5db;
   background: #ffffff;
   color: #6b7280;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .d1-region-btn:hover {
   background: #f3f4f6;
@@ -273,30 +274,18 @@
   border-color: var(--heat-blue-800, #003e51);
   color: #ffffff;
 }
-/* SADC — amber, inactive: colored text+border, active: filled */
-.d1-region-btn[data-region="SADC"] {
-  color: #B45309; border-color: #B45309;
-}
+/* SADC — amber */
+.d1-region-btn[data-region="SADC"] { color: #B45309; border-color: #B45309; }
 .d1-region-btn--active[data-region="SADC"],
-.d1-region-btn[aria-pressed="true"][data-region="SADC"] {
-  background: #B45309; border-color: #B45309; color: #ffffff;
-}
+.d1-region-btn[aria-pressed="true"][data-region="SADC"] { background: #B45309; border-color: #B45309; color: #fff; }
 /* ECOWAS — purple */
-.d1-region-btn[data-region="ECOWAS"] {
-  color: #7C3AED; border-color: #7C3AED;
-}
+.d1-region-btn[data-region="ECOWAS"] { color: #7C3AED; border-color: #7C3AED; }
 .d1-region-btn--active[data-region="ECOWAS"],
-.d1-region-btn[aria-pressed="true"][data-region="ECOWAS"] {
-  background: #7C3AED; border-color: #7C3AED; color: #ffffff;
-}
+.d1-region-btn[aria-pressed="true"][data-region="ECOWAS"] { background: #7C3AED; border-color: #7C3AED; color: #fff; }
 /* EAC — teal */
-.d1-region-btn[data-region="EAC"] {
-  color: #0891B2; border-color: #0891B2;
-}
+.d1-region-btn[data-region="EAC"] { color: #0891B2; border-color: #0891B2; }
 .d1-region-btn--active[data-region="EAC"],
-.d1-region-btn[aria-pressed="true"][data-region="EAC"] {
-  background: #0891B2; border-color: #0891B2; color: #ffffff;
-}
+.d1-region-btn[aria-pressed="true"][data-region="EAC"] { background: #0891B2; border-color: #0891B2; color: #fff; }
 .d1-result-count {
   font-size: 11px;
   color: #6b7280;
@@ -2108,7 +2097,7 @@
                 hideMapLoading();
 
                 const projection = d3.geoMercator()
-                    .fitExtent([[90, 10], [width - 90, height - 60]], geoData);
+                    .fitExtent([[10, 10], [width - 10, height - 10]], geoData);
 
                 path = d3.geoPath().projection(projection);
 
